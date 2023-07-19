@@ -1,0 +1,57 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+
+# --- Locations
+ROOT_DIR = Path(__file__).parent
+ASSETS_DIR = ROOT_DIR.joinpath("assets")
+FONTS_DIR = ASSETS_DIR.joinpath("fonts")
+
+# --- Main window info
+WINDOW_WIDTH = 300
+WINDOW_HEIGHT = 150
+WINDOW_SIZE = f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}"
+WINDOW_TITLE = "Until Zero"
+
+# --- Timer options
+OPTION_POMODORO = 25
+OPTION_SHORT_BREAK = 5
+OPTION_LONG_BREAK = 15
+
+# --- Text
+SUM_TIMERS_PLACEHOLDER = "..."
+SUM_TIMERS_ERROR = "To the infinity and beyond!"
+
+# --- Fonts
+FONT = "CozetteVector"
+LABEL_SIZE = 12
+OPTION_BTN_SIZE = 9
+START_BTN_SIZE = 12
+CLEAN_BTN_SIZE = 7
+
+# --- Color palette
+COLOR0 = "#000000"
+COLOR1 = "#c5143e"
+COLOR2 = "#ffe100"
+COLOR3 = "#10ebeb"
+COLOR4 = "#c22349"
+COLOR5 = "#9370db"
+COLOR6 = "#7b4ddb"
+COLOR7 = "#27b3b3"
+COLOR8 = "#ffffff"
+
+# --- Color config
+BACKGROUND_COLOR = COLOR2
+TEXT_COLOR = COLOR0
+INPUT_COLOR = COLOR8
+INPUT_BG_COLOR = COLOR0
+OPTION_BTN_COLOR = COLOR8
+OPTION_BTN_BG_COLOR = COLOR5
+OPTION_BTN_BG_ACTIVE_COLOR = COLOR6
+START_BTN_COLOR = COLOR8
+START_BTN_BG_COLOR = COLOR4
+START_BTN_BG_ACTIVE_COLOR = COLOR1
+CLEAN_BTN_COLOR = COLOR0
+CLEAN_BTN_BG_COLOR = COLOR3
+CLEAN_BTN_BG_ACTIVE_COLOR = COLOR7
