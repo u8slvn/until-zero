@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "until-zero"
+version = "0.1.0"
+description = ""
+authors = ["u8slvn <u8slvn@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "until_zero"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+fix = true
+line-length = 88
+extend-select = [
+    "I",   # isort
+]
+
+[tool.ruff.isort]
+force-single-line = true
+lines-between-types = 1
+lines-after-imports = 2
+required-imports = ["from __future__ import annotations"]
