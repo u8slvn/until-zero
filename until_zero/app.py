@@ -9,6 +9,7 @@ from until_zero import pomodoro
 from until_zero.gui.button import BlueButton
 from until_zero.gui.button import PurpleButton
 from until_zero.gui.button import RedButton
+from until_zero.gui.draggable import Draggable
 from until_zero.gui.frame import Frame
 from until_zero.gui.input import Input
 from until_zero.gui.label import Label
@@ -168,26 +169,28 @@ class RunTimers(tkinter.Toplevel):
         self.current_timer = None
         self.paused = False
 
-        # -- Column 0
+        # --- Column 0
         self.pause_btn = PurpleButton(
             self, text="⏸", text_size=const.TIMER_WINDOW_BTN_SIZE, command=self.toggle_pause
         )
-        # -- Column 1
+        # --- Column 1
         self.timer_label = Label(self, text="yolo", size=10)
-        # -- Column 2
+        # --- Column 2
         frames = [
             const.ASSETS_DIR.joinpath("bongo-cat-0.png"),
             const.ASSETS_DIR.joinpath("bongo-cat-1.png"),
             const.ASSETS_DIR.joinpath("bongo-cat-2.png"),
         ]
         self.bongo_cat = Sprite(self, width=38, height=30, frames=frames, frame_rate=150)
-        # -- Column 3
+        # --- Column 3
         self.stop_btn = RedButton(
             self,
             text="⏹",
             text_size=const.TIMER_WINDOW_BTN_SIZE,
             command=self.app.config_timers.stop_timers,
         )
+        # --- Column 4
+        self.draggable = Draggable(self, width=10)
 
         self.configure_component_grid()
 
@@ -202,6 +205,7 @@ class RunTimers(tkinter.Toplevel):
         self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.E)
         self.bongo_cat.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
         self.stop_btn.grid(row=0, column=3, padx=5, pady=5, sticky=tkinter.E)
+        self.draggable.grid(row=0, column=4, sticky=tkinter.NS)
 
     def toggle_pause(self):
         self.paused = not self.paused
