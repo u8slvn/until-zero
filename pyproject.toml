@@ -9,6 +9,7 @@ packages = [{include = "until_zero"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+pillow = "^10.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -18,10 +19,12 @@ pre-commit = "^3.3.3"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.black]
+line_length = 99
 
 [tool.ruff]
 fix = true
-line-length = 88
+line-length = 99
 extend-select = [
     "I",   # isort
 ]

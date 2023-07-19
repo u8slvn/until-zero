@@ -6,208 +6,214 @@ from functools import partial
 
 from until_zero import constants as const
 from until_zero import pomodoro
+from until_zero.gui.button import BlueButton
+from until_zero.gui.button import PurpleButton
+from until_zero.gui.button import RedButton
+from until_zero.gui.frame import Frame
+from until_zero.gui.input import Input
+from until_zero.gui.label import Label
+from until_zero.gui.sprite import Sprite
 from until_zero.pomodoro import extract_timers_from_input
-from until_zero.utils import format_timer_for_human
+from until_zero.tools import StepTimer
+from until_zero.tools import format_timer_for_human
 
 
 class App(tkinter.Tk):
     def __init__(self) -> None:
         super().__init__()
-
         self.timers: list[int] = []
+        self.width = const.WINDOW_WIDTH
+        self.height = const.WINDOW_HEIGHT
 
-        self.geometry(const.WINDOW_SIZE)
+        self.geometry(f"{self.width}x{self.height}")
         self.title(const.WINDOW_TITLE)
         self.resizable(width=False, height=False)
-        self.configure(
-            background=const.BACKGROUND_COLOR,
-        )
+        self.configure(background=const.BACKGROUND_COLOR)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self._position_window()
 
         self.validate_pomodoro_input = self.register(pomodoro.validate_input)
 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure(2, weight=1)
+        self.config_timers = ConfigTimers(app=self)
+        self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
 
-        self.config_frame = tkinter.Frame(self, width=const.WINDOW_WIDTH)
-        self.config_frame.configure(background=const.BACKGROUND_COLOR)
-        self.config_frame.grid(
-            row=0, column=0, columnspan=3, padx=5, pady=5, sticky=tkinter.EW
-        )
-        self.config_frame.grid_columnconfigure(0, weight=1)
-        self.config_frame.grid_columnconfigure(1, weight=1)
-        self.config_frame.grid_columnconfigure(2, weight=1)
+        self.run_timers: RunTimers | None = None
 
-        self.label = Label(self.config_frame, text="STEPS:")
-        self.label.grid(row=0, column=0, sticky=tkinter.W)
+    def _position_window(self):
+        self.update()
+        x = (self.winfo_screenwidth() - self.winfo_width()) // 2
+        y = (self.winfo_screenheight() - self.winfo_height()) // 2
+        self.geometry("+%d+%d" % (x, y))
 
-        self.clean_btn = CleanButton(
-            self.config_frame, text="RESET", command=self.clean
-        )
-        self.clean_btn.grid(row=0, column=2, sticky=tkinter.E)
+    def get_next_timer(self) -> StepTimer | None:
+        if len(self.timers) > 0:
+            return StepTimer(duration=self.timers.pop(-1))
+        return None
 
-        self.input_var = tkinter.StringVar()
-        self.input_var.trace("w", self.update_total)
+    def hide(self) -> None:
+        self.withdraw()
 
-        self.input = Input(
-            self.config_frame,
-            validate=self.validate_pomodoro_input,
-            textvariable=self.input_var,
-        )
-        self.input.grid(row=1, column=0, columnspan=3, sticky=tkinter.EW)
+    def show(self) -> None:
+        self.deiconify()
 
-        self.total = Label(self.config_frame, text=const.SUM_TIMERS_PLACEHOLDER)
-        self.total.grid(row=2, column=2, sticky=tkinter.E)
 
-        self.pomodoro_btn = OptionButton(
+class ConfigTimers(Frame):
+    def __init__(self, app: App):
+        super().__init__(app=app, rows=5, columns=3)
+        # --- Row 0
+        self.steps_label = Label(self, text="STEPS:")
+        self.clean_btn = BlueButton(
             self,
-            text="POMODORO",
-            command=partial(self.add_option, const.OPTION_POMODORO),
+            text="RESET",
+            text_size=const.CLEAN_BTN_SIZE,
+            command=self.clean,
         )
-        self.pomodoro_btn.grid(row=1, column=0, padx=5, pady=5)
-
-        self.short_break_btn = OptionButton(
+        # -- Row 1
+        self.timers_input = Input(
+            self,
+            validate=self.app.validate_pomodoro_input,
+            update_callback=self.update_total,
+        )
+        # -- Row 2
+        self.total_label = Label(self, text=const.SUM_TIMERS_PLACEHOLDER, size=10)
+        # -- Row 3
+        self.task_btn = PurpleButton(
+            self,
+            text="TASK",
+            text_size=const.OPTION_BTN_SIZE,
+            command=partial(self.add_option, const.OPTION_TASK),
+        )
+        self.short_break_btn = PurpleButton(
             self,
             text="SHORT BREAK",
+            text_size=const.OPTION_BTN_SIZE,
             command=partial(self.add_option, const.OPTION_SHORT_BREAK),
         )
-        self.short_break_btn.grid(row=1, column=1, padx=5, pady=5)
-
-        self.long_break_btn = OptionButton(
+        self.long_break_btn = PurpleButton(
             self,
             text="LONG BREAK",
+            text_size=const.OPTION_BTN_SIZE,
             command=partial(self.add_option, const.OPTION_LONG_BREAK),
         )
-        self.long_break_btn.grid(row=1, column=2, padx=5, pady=5)
+        # -- Row 4
+        self.start_button = RedButton(
+            self,
+            text="START",
+            text_size=const.START_BTN_SIZE,
+            command=self.start_timers,
+        )
 
-        self.start_button = StartButton(self, text="START", command=self.start_timers)
-        self.start_button.grid(row=2, column=0, columnspan=3, padx=5, pady=5)
+        self.configure_component_grid()
 
-    def add_option(self, option: int) -> None:
-        timers_input = self.input_var.get()
-        if timers_input != "":
-            self.input_var.set(f"{timers_input}+{option}")
-        else:
-            self.input_var.set(str(option))
+    def configure_component_grid(self):
+        self.steps_label.grid(row=0, column=0, padx=5, pady=0, sticky=tkinter.W)
+        self.clean_btn.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
+
+        self.timers_input.grid(row=1, column=0, columnspan=3, padx=5, pady=0, sticky=tkinter.EW)
+
+        self.total_label.grid(row=2, column=0, columnspan=3, padx=5, pady=0, sticky=tkinter.E)
+
+        self.task_btn.grid(row=3, column=0, padx=5, pady=2, sticky=tkinter.EW)
+        self.short_break_btn.grid(row=3, column=1, padx=5, pady=2, sticky=tkinter.EW)
+        self.long_break_btn.grid(row=3, column=2, padx=5, pady=2, sticky=tkinter.EW)
+
+        self.start_button.grid(row=4, column=0, columnspan=3, padx=3, pady=3, sticky=tkinter.EW)
 
     def update_total(self, *_) -> None:
-        timers_input = self.input_var.get()
-        self.timers = extract_timers_from_input(timers_input)
+        timers_input = self.timers_input.input_var.get()
+        self.app.timers = extract_timers_from_input(timers_input)
 
         try:
-            text = format_timer_for_human(sum(self.timers))
+            text = format_timer_for_human(sum(self.app.timers))
         except OverflowError:
             text = const.SUM_TIMERS_ERROR
 
-        self.total.config(text=text)
+        self.total_label.config(text=text)
+
+    def add_option(self, option: int) -> None:
+        timers_input = self.timers_input.input_var.get()
+        if timers_input != "":
+            self.timers_input.input_var.set(f"{timers_input}+{option}")
+        else:
+            self.timers_input.input_var.set(str(option))
+        self.timers_input.icursor(tkinter.END)
 
     def clean(self) -> None:
-        self.input.delete(0, tkinter.END)
-        self.input.insert(0, "")
+        self.timers_input.delete(0, tkinter.END)
+        self.timers_input.insert(0, "")
 
     def start_timers(self) -> None:
-        self.state(newstate="iconic")
-        self.clean_btn.config(state=tkinter.DISABLED)
-        self.pomodoro_btn.config(state=tkinter.DISABLED)
-        self.short_break_btn.config(state=tkinter.DISABLED)
-        self.long_break_btn.config(state=tkinter.DISABLED)
-        self.input.config(state=tkinter.DISABLED)
-        self.start_button.config(text="STOP", command=self.stop_timers)
+        self.app.run_timers = RunTimers(app=self.app)
+        self.app.run_timers.start_timers()
+        self.app.hide()
 
     def stop_timers(self) -> None:
-        self.clean_btn.config(state=tkinter.NORMAL)
-        self.pomodoro_btn.config(state=tkinter.NORMAL)
-        self.short_break_btn.config(state=tkinter.NORMAL)
-        self.long_break_btn.config(state=tkinter.NORMAL)
-        self.input.config(state=tkinter.NORMAL)
-        self.start_button.config(text="START", command=self.start_timers)
+        self.clean()
+        self.app.run_timers.destroy()
+        self.app.show()
 
 
-class CleanButton(tkinter.Button):
-    def __init__(self, master: tkinter.Misc, text: str, **kwargs):
-        super().__init__(
-            master=master,
-            text=text,
-            font=(const.FONT, const.CLEAN_BTN_SIZE),
-            **kwargs,
-        )
-        self.configure(
-            foreground=const.CLEAN_BTN_COLOR,
-            activeforeground=const.CLEAN_BTN_COLOR,
-            background=const.CLEAN_BTN_BG_COLOR,
-            activebackground=const.CLEAN_BTN_BG_ACTIVE_COLOR,
-            relief=tkinter.GROOVE,
+class RunTimers(tkinter.Toplevel):
+    def __init__(self, app: App) -> None:
+        super().__init__(master=app)
+        self.app = app
+        self.geometry("300x30")
+        self.overrideredirect(True)
+        self.attributes("-topmost", True)
+        self.configure(background=const.BACKGROUND_COLOR)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self._position_window()
+        self.current_timer = None
+
+        # -- Column 0
+        self.pause_btn = PurpleButton(self, text="⏸", text_size=const.TIMER_WINDOW_BTN_SIZE)
+        # -- Column 1
+        self.timer_label = Label(self, text="yolo", size=10)
+        # -- Column 2
+        frames = [
+            const.ASSETS_DIR.joinpath("bongo-cat-0.png"),
+            const.ASSETS_DIR.joinpath("bongo-cat-1.png"),
+            const.ASSETS_DIR.joinpath("bongo-cat-2.png"),
+        ]
+        self.image = Sprite(self, width=38, height=30, frames=frames, frame_rate=150)
+        # -- Column 3
+        self.stop_btn = RedButton(
+            self,
+            text="⏹",
+            text_size=const.TIMER_WINDOW_BTN_SIZE,
+            command=self.app.config_timers.stop_timers,
         )
 
+        self.configure_component_grid()
 
-class StartButton(tkinter.Button):
-    def __init__(self, master: tkinter.Misc, text: str, **kwargs):
-        super().__init__(
-            master=master,
-            text=text,
-            width=100,
-            font=(const.FONT, const.START_BTN_SIZE),
-            **kwargs,
-        )
-        self.configure(
-            foreground=const.START_BTN_COLOR,
-            activeforeground=const.START_BTN_COLOR,
-            background=const.START_BTN_BG_COLOR,
-            activebackground=const.START_BTN_BG_ACTIVE_COLOR,
-            relief=tkinter.GROOVE,
-        )
+    def _position_window(self):
+        self.update_idletasks()
+        x = (self.winfo_screenwidth() - self.winfo_width()) // 2
+        y = 0
+        self.geometry("+%d+%d" % (x, y))
 
+    def configure_component_grid(self):
+        self.pause_btn.grid(row=0, column=0, padx=5, pady=5, sticky=tkinter.W)
+        self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.E)
+        self.image.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
+        self.stop_btn.grid(row=0, column=3, padx=5, pady=5, sticky=tkinter.E)
 
-class OptionButton(tkinter.Button):
-    def __init__(self, master: tkinter.Misc, text: str, **kwargs):
-        super().__init__(
-            master=master,
-            text=text,
-            width=100,
-            font=(const.FONT, const.OPTION_BTN_SIZE),
-            **kwargs,
-        )
-        self.configure(
-            foreground=const.OPTION_BTN_COLOR,
-            activeforeground=const.OPTION_BTN_COLOR,
-            background=const.OPTION_BTN_BG_COLOR,
-            activebackground=const.OPTION_BTN_BG_ACTIVE_COLOR,
-            relief=tkinter.GROOVE,
-        )
+    def start_timers(self):
+        self.current_timer = self.app.get_next_timer()
+        self.update_timer()
 
-
-class Label(tkinter.Label):
-    def __init__(self, master: tkinter.Misc, text: str) -> None:
-        super().__init__(
-            master=master,
-            text=text,
-            font=(const.FONT, const.LABEL_SIZE),
-            foreground=const.TEXT_COLOR,
-            justify=tkinter.CENTER,
-        )
-        self.configure(
-            background=const.BACKGROUND_COLOR,
-        )
-
-
-class Input(tkinter.Entry):
-    def __init__(
-        self, master: tkinter.Misc, validate: str, textvariable: tkinter.StringVar
-    ):
-        super().__init__(
-            master=master,
-            justify=tkinter.CENTER,
-            font=(const.FONT, const.LABEL_SIZE),
-            textvariable=textvariable,
-        )
-        self.config(validate="key", validatecommand=(validate, "%P"))
-        self.configure(
-            borderwidth=3,
-            relief=tkinter.FLAT,
-            background=const.INPUT_BG_COLOR,
-            foreground=const.INPUT_COLOR,
-            insertbackground=const.INPUT_COLOR,
-        )
+    def update_timer(self):
+        if self.current_timer.is_running():
+            text = format_timer_for_human(self.current_timer.duration)
+            self.timer_label.configure(text=text)
+            self.current_timer.tick()
+            self.after(1000, self.update_timer)
+        else:
+            self.current_timer.ring()
+            if len(self.app.timers) > 0:
+                self.current_timer = self.app.get_next_timer()
+                self.update_timer()
+            else:
+                self.current_timer = None
