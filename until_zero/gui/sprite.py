@@ -27,6 +27,7 @@ class Sprite(tkinter.Label):
         self.frames = cycle(self._frames)
         self.frame_rate = frame_rate
         self.configure(background=const.BACKGROUND_COLOR)
+        self.stopped = False
 
         self.start()
 
@@ -35,9 +36,16 @@ class Sprite(tkinter.Label):
         return ImageTk.PhotoImage(Image.open(file).convert("RGBA"))
 
     def _update_frame(self) -> None:
+        if self.stopped is True:
+            return
+
         next_frame = next(self.frames)
         self.configure(image=next_frame)
         self.after(self.frame_rate, self._update_frame)
 
     def start(self) -> None:
+        self.stopped = False
         self._update_frame()
+
+    def stop(self):
+        self.stopped = True
