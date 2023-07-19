@@ -25,3 +25,19 @@ def format_timer_for_human(timer: int) -> str:
         return SUM_TIMERS_PLACEHOLDER
 
     return ", ".join(human_td)
+
+
+class StepTimer:
+    def __init__(self, duration: int) -> None:
+        self.duration = duration
+
+    def tick(self) -> None:
+        if self.duration <= 0:
+            self.ring()
+        self.duration -= 1
+
+    def is_running(self):
+        return self.duration >= 0
+
+    def ring(self) -> None:
+        print("Ring!")
