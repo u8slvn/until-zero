@@ -166,9 +166,12 @@ class RunTimers(tkinter.Toplevel):
         self.grid_columnconfigure(1, weight=1)
         self._position_window()
         self.current_timer = None
+        self.paused = False
 
         # -- Column 0
-        self.pause_btn = PurpleButton(self, text="⏸", text_size=const.TIMER_WINDOW_BTN_SIZE)
+        self.pause_btn = PurpleButton(
+            self, text="⏸", text_size=const.TIMER_WINDOW_BTN_SIZE, command=self.toggle_pause
+        )
         # -- Column 1
         self.timer_label = Label(self, text="yolo", size=10)
         # -- Column 2
@@ -177,7 +180,7 @@ class RunTimers(tkinter.Toplevel):
             const.ASSETS_DIR.joinpath("bongo-cat-1.png"),
             const.ASSETS_DIR.joinpath("bongo-cat-2.png"),
         ]
-        self.image = Sprite(self, width=38, height=30, frames=frames, frame_rate=150)
+        self.bongo_cat = Sprite(self, width=38, height=30, frames=frames, frame_rate=150)
         # -- Column 3
         self.stop_btn = RedButton(
             self,
@@ -197,23 +200,33 @@ class RunTimers(tkinter.Toplevel):
     def configure_component_grid(self):
         self.pause_btn.grid(row=0, column=0, padx=5, pady=5, sticky=tkinter.W)
         self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.E)
-        self.image.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
+        self.bongo_cat.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
         self.stop_btn.grid(row=0, column=3, padx=5, pady=5, sticky=tkinter.E)
+
+    def toggle_pause(self):
+        self.paused = not self.paused
+        if self.paused is False and self.current_timer is not None:
+            self.after(1000, self.update_timer)
+            self.pause_btn.configure(text="⏸")
+            self.bongo_cat.start()
+        else:
+            self.pause_btn.configure(text="🞂")
+            self.bongo_cat.stop()
 
     def start_timers(self):
         self.current_timer = self.app.get_next_timer()
-        self.update_timer()
+        if self.current_timer is not None:
+            self.update_timer()
 
     def update_timer(self):
+        if self.paused is True:
+            return
+
+        text = format_timer_for_human(self.current_timer.duration)
+        self.timer_label.configure(text=text)
+        self.current_timer.tick()
+
         if self.current_timer.is_running():
-            text = format_timer_for_human(self.current_timer.duration)
-            self.timer_label.configure(text=text)
-            self.current_timer.tick()
             self.after(1000, self.update_timer)
         else:
-            self.current_timer.ring()
-            if len(self.app.timers) > 0:
-                self.current_timer = self.app.get_next_timer()
-                self.update_timer()
-            else:
-                self.current_timer = None
+            self.start_timers()
