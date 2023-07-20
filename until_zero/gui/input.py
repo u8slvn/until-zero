@@ -21,7 +21,13 @@ class Input(tkinter.Entry):
         self.configure(
             borderwidth=3,
             relief=tkinter.FLAT,
-            background=const.INPUT_BG_COLOR,
-            foreground=const.INPUT_COLOR,
-            insertbackground=const.INPUT_COLOR,
+            background=const.BLACK,
+            foreground=const.WHITE,
+            insertbackground=const.WHITE,
         )
+
+    def mark_as_valid(self) -> None:
+        self.configure(foreground=const.WHITE)
+
+    def mark_as_error(self) -> None:
+        self.configure(foreground=const.RED)

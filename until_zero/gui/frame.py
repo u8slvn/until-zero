@@ -18,7 +18,7 @@ class Frame(tkinter.Frame):
         self.rows = rows
         self.columns = columns
         self._configure_grid()
-        self.configure(background=const.BACKGROUND_COLOR)
+        self.configure(background=const.YELLOW)
 
     def _configure_grid(self):
         for row_index in range(self.rows):

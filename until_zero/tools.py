@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 from datetime import timedelta
+from typing import TYPE_CHECKING
+
+from PIL import Image
+from PIL import ImageTk
 
 from until_zero.constants import SUM_TIMERS_PLACEHOLDER
+
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def format_timer_for_human(timer: int) -> str:
@@ -40,4 +48,9 @@ class StepTimer:
         return self.duration >= 0
 
     def ring(self) -> None:
-        print("Ring!")
+        ...
+        # print("Ring!")
+
+
+def open_alpha_image(file: Path) -> ImageTk.PhotoImage:
+    return ImageTk.PhotoImage(Image.open(file).convert("RGBA"))

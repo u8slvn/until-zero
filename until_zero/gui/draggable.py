@@ -5,13 +5,14 @@ import tkinter
 from typing import TYPE_CHECKING
 
 from until_zero import constants as const
+from until_zero.tools import open_alpha_image
 
 
 if TYPE_CHECKING:
     pass
 
 
-class Draggable(tkinter.Frame):
+class Draggable(tkinter.Label):
     def __init__(self, parent, width: int) -> None:
         super().__init__(master=parent)
         self.parent = parent
@@ -22,17 +23,20 @@ class Draggable(tkinter.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        self.label = tkinter.Label(self, text="⋮", cursor="fleur", relief=tkinter.FLAT)
-        self.label.configure(background=const.DRAGGABLE_BG)
+        self.img = open_alpha_image(const.ASSETS_DIR.joinpath("drag.png"))
+        self.configure(
+            image=self.img,
+            cursor="fleur",
+            borderwidth=0,
+            highlightthickness=0,
+            font=(const.FONT, 15),
+            background=const.DARK_YELLOW,
+        )
 
-        self.label.bind("<Button-1>", self.on_hold)
-        self.label.bind("<ButtonRelease-1>", self.on_release)
-        self.label.bind("<B1-Motion>", self.on_drag)
-
-        self.configure_component_grid()
-
-    def configure_component_grid(self):
-        self.label.grid(row=0, column=0, sticky=tkinter.NSEW)
+        self.bind("<Button-1>", self.on_hold)
+        self.bind("<ButtonRelease-1>", self.on_release)
+        self.bind("<B1-Motion>", self.on_drag)
+        self.bind("<Double-Button-1>", self.reset_parent_pos)
 
     def on_hold(self, _: tkinter.Event) -> None:
         mouse_x, mouse_y = self.parent.winfo_pointerxy()
@@ -49,3 +53,6 @@ class Draggable(tkinter.Frame):
     def on_release(self, _: tkinter.Event) -> None:
         self.pos_x = 0
         self.pos_y = 0
+
+    def reset_parent_pos(self, _: tkinter.Event) -> None:
+        self.parent.position_window()

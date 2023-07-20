@@ -5,10 +5,8 @@ import tkinter
 from itertools import cycle
 from pathlib import Path
 
-from PIL import Image
-from PIL import ImageTk
-
 from until_zero import constants as const
+from until_zero.tools import open_alpha_image
 
 
 class Sprite(tkinter.Label):
@@ -23,17 +21,13 @@ class Sprite(tkinter.Label):
         super().__init__(master=parent, width=width, height=height)
         self.width = width
         self.height = height
-        self._frames = [self._open_frame(file) for file in frames]
+        self._frames = [open_alpha_image(file) for file in frames]
         self.frames = cycle(self._frames)
         self.frame_rate = frame_rate
-        self.configure(background=const.BACKGROUND_COLOR)
+        self.configure(background=const.YELLOW)
         self.stopped = False
 
         self.start()
-
-    @staticmethod
-    def _open_frame(file: Path) -> ImageTk.PhotoImage:
-        return ImageTk.PhotoImage(Image.open(file).convert("RGBA"))
 
     def _update_frame(self) -> None:
         if self.stopped is True:

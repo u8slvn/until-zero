@@ -12,7 +12,18 @@ class Label(tkinter.Label):
             master=master,
             text=text,
             font=(const.FONT, size),
-            foreground=const.TEXT_COLOR,
-            justify=tkinter.CENTER,
         )
-        self.configure(background=const.BACKGROUND_COLOR)
+        self.configure(foreground=const.BLACK, background=const.YELLOW)
+
+    def update_text(self, text: str) -> None:
+        self.configure(text=text)
+
+
+class TimerLabel(Label):
+    def __init__(self, master: tkinter.Misc, text: str, size: int = DEFAULT_SIZE) -> None:
+        super().__init__(
+            master=master,
+            text=text,
+            size=size,
+        )
+        self.configure(foreground=const.WHITE, background=const.BLACK, justify=tkinter.CENTER)

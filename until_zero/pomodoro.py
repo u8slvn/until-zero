@@ -9,7 +9,7 @@ EXTRACT_REG = re.compile(r"(?:(\d+)(?::(\d+))?\+?)")
 CHECK_REG = re.compile(r"^(((\d+):(\d?(?!\d+:\d+)))|(\d+)\+?)+$")
 
 
-def validate_input(string: str) -> bool:
+def validate_timers_input(string: str) -> bool:
     return CHECK_REG.match(string) is not None or string == ""
 
 
