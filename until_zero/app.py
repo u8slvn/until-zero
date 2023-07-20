@@ -5,7 +5,6 @@ import tkinter
 from functools import partial
 
 from until_zero import constants as const
-from until_zero import pomodoro
 from until_zero.gui.button import BlueButton
 from until_zero.gui.button import PurpleButton
 from until_zero.gui.button import RedButton
@@ -15,7 +14,6 @@ from until_zero.gui.input import Input
 from until_zero.gui.label import Label
 from until_zero.gui.label import TimerLabel
 from until_zero.gui.sprite import Sprite
-from until_zero.pomodoro import extract_timers_from_input
 from until_zero.tools import StepTimer
 from until_zero.tools import format_timer_for_human
 from until_zero.tools import open_alpha_image
@@ -35,8 +33,6 @@ class App(tkinter.Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.position_window()
-
-        self.validate_pomodoro_input = self.register(pomodoro.validate_timers_input)
 
         self.config_timers = ConfigTimers(app=self)
         self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
@@ -64,18 +60,19 @@ class App(tkinter.Tk):
 class ConfigTimers(Frame):
     def __init__(self, app: App):
         super().__init__(app=app, rows=5, columns=3)
+
+        self.reset_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-reset.png"))
+        self.task_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-task.png"))
+        self.s_break_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-s-break.png"))
+        self.l_break_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-l-break.png"))
+        self.start_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-start.png"))
+
         # --- Row 0
         self.steps_label = Label(self, text="STEPS:")
-        self.clean_btn = BlueButton(
-            self,
-            text="RESET",
-            text_size=const.CLEAN_BTN_SIZE,
-            command=self.clean,
-        )
+        self.clean_btn = BlueButton(self, image=self.reset_img, command=self.clean)
         # -- Row 1
         self.timers_input = Input(
             self,
-            validate=self.app.validate_pomodoro_input,
             update_callback=self.update_total,
         )
         # -- Row 2
@@ -83,29 +80,21 @@ class ConfigTimers(Frame):
         # -- Row 3
         self.task_btn = PurpleButton(
             self,
-            text="TASK",
-            text_size=const.OPTION_BTN_SIZE,
+            image=self.task_img,
             command=partial(self.add_option, const.OPTION_TASK),
         )
         self.short_break_btn = PurpleButton(
             self,
-            text="SHORT BREAK",
-            text_size=const.OPTION_BTN_SIZE,
+            image=self.s_break_img,
             command=partial(self.add_option, const.OPTION_SHORT_BREAK),
         )
         self.long_break_btn = PurpleButton(
             self,
-            text="LONG BREAK",
-            text_size=const.OPTION_BTN_SIZE,
+            image=self.l_break_img,
             command=partial(self.add_option, const.OPTION_LONG_BREAK),
         )
         # -- Row 4
-        self.start_button = RedButton(
-            self,
-            text="START",
-            text_size=const.START_BTN_SIZE,
-            command=self.start_timers,
-        )
+        self.start_button = RedButton(self, image=self.start_img, command=self.start_timers)
 
         self.timers_input.bind("<Return>", self.start_timers)
 
@@ -114,20 +103,15 @@ class ConfigTimers(Frame):
     def configure_component_grid(self):
         self.steps_label.grid(row=0, column=0, padx=5, pady=0, sticky=tkinter.W)
         self.clean_btn.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
-
-        self.timers_input.grid(row=1, column=0, columnspan=3, padx=5, pady=0, sticky=tkinter.EW)
-
+        self.timers_input.grid(row=1, column=0, columnspan=3, padx=2, pady=0, sticky=tkinter.EW)
         self.total_label.grid(row=2, column=0, columnspan=3, padx=5, pady=0, sticky=tkinter.E)
-
-        self.task_btn.grid(row=3, column=0, padx=5, pady=2, sticky=tkinter.EW)
-        self.short_break_btn.grid(row=3, column=1, padx=5, pady=2, sticky=tkinter.EW)
-        self.long_break_btn.grid(row=3, column=2, padx=5, pady=2, sticky=tkinter.EW)
-
-        self.start_button.grid(row=4, column=0, columnspan=3, padx=3, pady=3, sticky=tkinter.EW)
+        self.task_btn.grid(row=3, column=0, padx=5, pady=1, sticky=tkinter.NSEW)
+        self.short_break_btn.grid(row=3, column=1, padx=5, pady=1, sticky=tkinter.NSEW)
+        self.long_break_btn.grid(row=3, column=2, padx=5, pady=1, sticky=tkinter.NSEW)
+        self.start_button.grid(row=4, column=0, columnspan=3, padx=5, pady=8, sticky=tkinter.NSEW)
 
     def update_total(self, *_) -> None:
-        timers_input = self.timers_input.input_var.get()
-        timers = extract_timers_from_input(timers_input)
+        timers = self.timers_input.get_timers()
 
         try:
             self.timers_input.mark_as_valid()
@@ -188,12 +172,7 @@ class TimersWidget(tkinter.Toplevel):
         self.stop_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-stop.png"))
 
         # --- Column 0
-        self.pause_btn = PurpleButton(
-            self,
-            image=self.pause_img,
-            text_size=const.TIMER_WINDOW_BTN_SIZE,
-            command=self.toggle_pause,
-        )
+        self.pause_btn = PurpleButton(self, image=self.pause_img, command=self.toggle_pause)
         # --- Column 1
         self.timer_label = TimerLabel(self, text="No timer, no work!", size=10)
         # --- Column 2
@@ -207,7 +186,6 @@ class TimersWidget(tkinter.Toplevel):
         self.stop_btn = RedButton(
             self,
             image=self.stop_img,
-            text_size=const.TIMER_WINDOW_BTN_SIZE,
             command=self.app.config_timers.stop_timers,
         )
         # --- Column 4
@@ -215,13 +193,13 @@ class TimersWidget(tkinter.Toplevel):
 
         self.configure_component_grid()
 
-    def position_window(self):
+    def position_window(self) -> None:
         self.update_idletasks()
         x = (self.winfo_screenwidth() - self.winfo_width()) // 2
         y = 0
         self.geometry("+%d+%d" % (x, y))
 
-    def configure_component_grid(self):
+    def configure_component_grid(self) -> None:
         self.pause_btn.grid(row=0, column=0, padx=5, pady=5, sticky=tkinter.W)
         self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.EW)
         self.bongo_cat.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
@@ -237,21 +215,21 @@ class TimersWidget(tkinter.Toplevel):
         self.pause_btn.configure(image=self.pause_img)
         self.bongo_cat.start()
 
-    def toggle_pause(self):
+    def toggle_pause(self) -> None:
         self.paused = not self.paused
         if self.paused is False and self.current_timer is not None:
             self._unpause()
         else:
             self._pause()
 
-    def start_timers(self):
+    def start_timers(self) -> None:
         self.current_timer = self.app.get_next_timer()
         if self.current_timer is not None:
             self.update_timer()
         else:
             self._pause()
 
-    def update_timer(self):
+    def update_timer(self) -> None:
         if self.paused is True:
             return
 

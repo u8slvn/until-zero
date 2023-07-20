@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import tkinter
 
 from typing import Callable
@@ -8,7 +9,12 @@ from until_zero import constants as const
 
 
 class Input(tkinter.Entry):
-    def __init__(self, master: tkinter.Misc, validate: str, update_callback: Callable[[], None]):
+    # https://regex101.com/r/Mf1U4z/1
+    EXTRACT_REG = re.compile(r"(?:(\d+)(?::(\d+))?\+?)")
+    # https://regex101.com/r/3RtSGv/1
+    CHECK_REG = re.compile(r"^(((\d+):(\d?(?!\d+:\d+)))|(\d+)\+?)+$")
+
+    def __init__(self, master: tkinter.Misc, update_callback: Callable[[], None]):
         self.input_var = tkinter.StringVar()
         self.input_var.trace("w", update_callback)
         super().__init__(
@@ -17,7 +23,8 @@ class Input(tkinter.Entry):
             font=(const.FONT, const.DEFAULT_SIZE),
             textvariable=self.input_var,
         )
-        self.config(validate="key", validatecommand=(validate, "%P"))
+        input_validator = self.register(self.validate_timers_input)
+        self.config(validate="key", validatecommand=(input_validator, "%P"))
         self.configure(
             borderwidth=3,
             relief=tkinter.FLAT,
@@ -31,3 +38,28 @@ class Input(tkinter.Entry):
 
     def mark_as_error(self) -> None:
         self.configure(foreground=const.RED)
+
+    @classmethod
+    def validate_timers_input(cls, value: str) -> bool:
+        return any(
+            [
+                cls.CHECK_REG.match(value) is not None and len(value) < const.TIMERS_INPUT_LENGTH,
+                value == "",
+            ]
+        )
+
+    def get_timers(self) -> list[int] | None:
+        string = self.input_var.get()
+        matches = self.EXTRACT_REG.findall(string)
+
+        timers = []
+        try:
+            for match in matches:
+                m, s = match
+                timer = int(m) * 60
+                timer += int(s) if s.isdigit() else 0
+                timers.append(timer)
+        except OverflowError:
+            return None
+
+        return timers
