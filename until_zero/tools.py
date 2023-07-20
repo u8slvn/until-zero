@@ -40,15 +40,15 @@ class StepTimer:
     sound = str(const.ASSETS_DIR.joinpath("bip.wav"))
 
     def __init__(self, duration: int) -> None:
-        self.duration = duration
+        self._duration = duration
 
     def tick(self) -> None:
-        if self.duration <= 0:
+        if self._duration <= 0:
             self.ring()
-        self.duration -= 1
+        self._duration -= 1
 
-    def is_running(self) -> None:
-        return self.duration >= 0
+    def is_running(self) -> bool:
+        return self._duration >= 0
 
     def ring(self) -> None:
         playsound(self.sound, block=False)
