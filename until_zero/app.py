@@ -234,7 +234,7 @@ class TimersWidget(tkinter.Toplevel):
         if self.paused is True:
             return
 
-        text = format_timer_for_human(self.current_timer.duration)
+        text = format_timer_for_human(self.current_timer._duration)
         self.timer_label.update_text(text=text)
         self.current_timer.tick()
         self.after(1000, [self.start_timers, self.update_timer][self.current_timer.is_running()])
