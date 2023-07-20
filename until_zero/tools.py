@@ -5,8 +5,9 @@ from typing import TYPE_CHECKING
 
 from PIL import Image
 from PIL import ImageTk
+from playsound import playsound
 
-from until_zero.constants import SUM_TIMERS_PLACEHOLDER
+from until_zero import constants as const
 
 
 if TYPE_CHECKING:
@@ -30,12 +31,14 @@ def format_timer_for_human(timer: int) -> str:
         human_td.append(f"{seconds}s")
 
     if not human_td:
-        return SUM_TIMERS_PLACEHOLDER
+        return const.SUM_TIMERS_PLACEHOLDER
 
     return ", ".join(human_td)
 
 
 class StepTimer:
+    sound = str(const.ASSETS_DIR.joinpath("bip.wav"))
+
     def __init__(self, duration: int) -> None:
         self.duration = duration
 
@@ -44,12 +47,11 @@ class StepTimer:
             self.ring()
         self.duration -= 1
 
-    def is_running(self):
+    def is_running(self) -> None:
         return self.duration >= 0
 
     def ring(self) -> None:
-        ...
-        # print("Ring!")
+        playsound(self.sound, block=False)
 
 
 def open_alpha_image(file: Path) -> ImageTk.PhotoImage:
