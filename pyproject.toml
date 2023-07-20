@@ -14,6 +14,8 @@ pillow = "^10.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.3"
+mypy = "^1.4.1"
+types-pillow = "^10.0.0.1"
 
 [build-system]
 requires = ["poetry-core"]

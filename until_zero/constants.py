@@ -8,7 +8,7 @@ ROOT_DIR = Path(__file__).parent
 ASSETS_DIR = ROOT_DIR.joinpath("assets")
 
 # --- Window info
-WINDOW_TITLE = "Until Zero"
+WINDOW_TITLE = "Until Zero - タイマー"
 WINDOW_WIDTH = 300
 WINDOW_HEIGHT = 145
 WINDOW_TIMER_WIDTH = 350
@@ -20,7 +20,7 @@ OPTION_SHORT_BREAK = 5
 OPTION_LONG_BREAK = 20
 
 # --- Timer Config
-MAX_SUM_TIMER = 365 * 24 * 60 * 60  # 1 year
+TIMERS_INPUT_LENGTH = 100
 
 # --- Text
 SUM_TIMERS_PLACEHOLDER = "0s"
