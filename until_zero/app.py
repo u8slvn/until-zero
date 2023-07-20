@@ -13,10 +13,12 @@ from until_zero.gui.draggable import Draggable
 from until_zero.gui.frame import Frame
 from until_zero.gui.input import Input
 from until_zero.gui.label import Label
+from until_zero.gui.label import TimerLabel
 from until_zero.gui.sprite import Sprite
 from until_zero.pomodoro import extract_timers_from_input
 from until_zero.tools import StepTimer
 from until_zero.tools import format_timer_for_human
+from until_zero.tools import open_alpha_image
 
 
 class App(tkinter.Tk):
@@ -29,19 +31,19 @@ class App(tkinter.Tk):
         self.geometry(f"{self.width}x{self.height}")
         self.title(const.WINDOW_TITLE)
         self.resizable(width=False, height=False)
-        self.configure(background=const.BACKGROUND_COLOR)
+        self.configure(background=const.YELLOW)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-        self._position_window()
+        self.position_window()
 
-        self.validate_pomodoro_input = self.register(pomodoro.validate_input)
+        self.validate_pomodoro_input = self.register(pomodoro.validate_timers_input)
 
         self.config_timers = ConfigTimers(app=self)
         self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
 
-        self.run_timers: RunTimers | None = None
+        self.run_timers: TimersWidget | None = None
 
-    def _position_window(self):
+    def position_window(self):
         self.update()
         x = (self.winfo_screenwidth() - self.winfo_width()) // 2
         y = (self.winfo_screenheight() - self.winfo_height()) // 2
@@ -49,7 +51,7 @@ class App(tkinter.Tk):
 
     def get_next_timer(self) -> StepTimer | None:
         if len(self.timers) > 0:
-            return StepTimer(duration=self.timers.pop(-1))
+            return StepTimer(duration=self.timers.pop(0))
         return None
 
     def hide(self) -> None:
@@ -105,6 +107,8 @@ class ConfigTimers(Frame):
             command=self.start_timers,
         )
 
+        self.timers_input.bind("<Return>", self.start_timers)
+
         self.configure_component_grid()
 
     def configure_component_grid(self):
@@ -123,12 +127,16 @@ class ConfigTimers(Frame):
 
     def update_total(self, *_) -> None:
         timers_input = self.timers_input.input_var.get()
-        self.app.timers = extract_timers_from_input(timers_input)
+        timers = extract_timers_from_input(timers_input)
 
         try:
-            text = format_timer_for_human(sum(self.app.timers))
+            self.timers_input.mark_as_valid()
+            text = format_timer_for_human(sum(timers))
+            self.app.timers = timers
         except OverflowError:
+            self.timers_input.mark_as_error()
             text = const.SUM_TIMERS_ERROR
+            self.app.timers = []
 
         self.total_label.config(text=text)
 
@@ -144,37 +152,50 @@ class ConfigTimers(Frame):
         self.timers_input.delete(0, tkinter.END)
         self.timers_input.insert(0, "")
 
-    def start_timers(self) -> None:
-        self.app.run_timers = RunTimers(app=self.app)
-        self.app.run_timers.start_timers()
+    def start_timers(self, _: tkinter.Event | None = None) -> None:
+        if not self.app.timers:
+            return
+
+        self.app.timers_widget = TimersWidget(app=self.app)
+        self.app.timers_widget.start_timers()
         self.app.hide()
 
     def stop_timers(self) -> None:
         self.clean()
-        self.app.run_timers.destroy()
+        self.app.timers_widget.destroy()
         self.app.show()
 
 
-class RunTimers(tkinter.Toplevel):
+class TimersWidget(tkinter.Toplevel):
     def __init__(self, app: App) -> None:
         super().__init__(master=app)
         self.app = app
-        self.geometry("300x30")
-        self.overrideredirect(True)
-        self.attributes("-topmost", True)
-        self.configure(background=const.BACKGROUND_COLOR)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
-        self._position_window()
         self.current_timer = None
         self.paused = False
+        self.width = const.WINDOW_TIMER_WIDTH
+        self.height = const.WINDOW_TIMER_HEIGHT
+
+        self.geometry(f"{self.width}x{self.height}")
+        self.overrideredirect(True)
+        self.attributes("-topmost", True)
+        self.configure(background=const.YELLOW)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.position_window()
+
+        self.play_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-play.png"))
+        self.pause_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-pause.png"))
+        self.stop_img = open_alpha_image(const.ASSETS_DIR.joinpath("btn-stop.png"))
 
         # --- Column 0
         self.pause_btn = PurpleButton(
-            self, text="⏸", text_size=const.TIMER_WINDOW_BTN_SIZE, command=self.toggle_pause
+            self,
+            image=self.pause_img,
+            text_size=const.TIMER_WINDOW_BTN_SIZE,
+            command=self.toggle_pause,
         )
         # --- Column 1
-        self.timer_label = Label(self, text="yolo", size=10)
+        self.timer_label = TimerLabel(self, text="No timer, no work!", size=10)
         # --- Column 2
         frames = [
             const.ASSETS_DIR.joinpath("bongo-cat-0.png"),
@@ -185,7 +206,7 @@ class RunTimers(tkinter.Toplevel):
         # --- Column 3
         self.stop_btn = RedButton(
             self,
-            text="⏹",
+            image=self.stop_img,
             text_size=const.TIMER_WINDOW_BTN_SIZE,
             command=self.app.config_timers.stop_timers,
         )
@@ -194,7 +215,7 @@ class RunTimers(tkinter.Toplevel):
 
         self.configure_component_grid()
 
-    def _position_window(self):
+    def position_window(self):
         self.update_idletasks()
         x = (self.winfo_screenwidth() - self.winfo_width()) // 2
         y = 0
@@ -202,35 +223,39 @@ class RunTimers(tkinter.Toplevel):
 
     def configure_component_grid(self):
         self.pause_btn.grid(row=0, column=0, padx=5, pady=5, sticky=tkinter.W)
-        self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.E)
+        self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.EW)
         self.bongo_cat.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
         self.stop_btn.grid(row=0, column=3, padx=5, pady=5, sticky=tkinter.E)
         self.draggable.grid(row=0, column=4, sticky=tkinter.NS)
 
+    def _pause(self) -> None:
+        self.pause_btn.configure(image=self.play_img)
+        self.bongo_cat.stop()
+
+    def _unpause(self) -> None:
+        self.after(1000, self.update_timer)
+        self.pause_btn.configure(image=self.pause_img)
+        self.bongo_cat.start()
+
     def toggle_pause(self):
         self.paused = not self.paused
         if self.paused is False and self.current_timer is not None:
-            self.after(1000, self.update_timer)
-            self.pause_btn.configure(text="⏸")
-            self.bongo_cat.start()
+            self._unpause()
         else:
-            self.pause_btn.configure(text="🞂")
-            self.bongo_cat.stop()
+            self._pause()
 
     def start_timers(self):
         self.current_timer = self.app.get_next_timer()
         if self.current_timer is not None:
             self.update_timer()
+        else:
+            self._pause()
 
     def update_timer(self):
         if self.paused is True:
             return
 
         text = format_timer_for_human(self.current_timer.duration)
-        self.timer_label.configure(text=text)
+        self.timer_label.update_text(text=text)
         self.current_timer.tick()
-
-        if self.current_timer.is_running():
-            self.after(1000, self.update_timer)
-        else:
-            self.start_timers()
+        self.after(1000, [self.start_timers, self.update_timer][self.current_timer.is_running()])
