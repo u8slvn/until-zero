@@ -6,6 +6,9 @@ from itertools import cycle
 from typing import TYPE_CHECKING
 
 from until_zero import constants as const
+from until_zero.session import Events
+from until_zero.session import session
+from until_zero.tools import open_alpha_image
 
 
 if TYPE_CHECKING:
@@ -46,3 +49,23 @@ class Sprite(tkinter.Label):
 
     def stop(self):
         self.stopped = True
+
+
+class BongoCat(Sprite):
+    def __init__(self, parent: tkinter.Misc):
+        frames = [
+            open_alpha_image(const.ASSETS_DIR.joinpath("bongo-cat-0.png")),
+            open_alpha_image(const.ASSETS_DIR.joinpath("bongo-cat-1.png")),
+            open_alpha_image(const.ASSETS_DIR.joinpath("bongo-cat-2.png")),
+        ]
+        super().__init__(parent=parent, width=38, height=30, frames=frames, frame_rate=150)
+
+        session.bind_event(Events.PAUSE_TIMER, self.on_pause)
+        session.bind_event(Events.UNPAUSE_TIMER, self.on_unpause)
+        session.bind_event(Events.TIMERS_STOPPED, self.on_pause)
+
+    def on_pause(self, _: tkinter.Event) -> None:
+        self.stop()
+
+    def on_unpause(self, _: tkinter.Event) -> None:
+        self.start()

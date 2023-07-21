@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import tkinter
 
+from functools import partial
 from typing import Callable
 
 from until_zero import constants as const
+from until_zero.session import Events
+from until_zero.session import session
 from until_zero.tools import open_alpha_image
 
 
@@ -45,30 +48,53 @@ class StartButton(Button):
     image_file = "btn-start.png"
 
 
-class ResetButton(Button):
+class CleanButton(Button):
     theme = BUTTON_THEMES["BLUE"]
     image_file = "btn-reset.png"
 
 
 class PomodoroButton(Button):
     theme = BUTTON_THEMES["PURPLE"]
+    duration: int
+
+    def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs):
+        super().__init__(parent=parent, command=partial(command, self.duration), **kwargs)
 
 
 class TaskButton(PomodoroButton):
     image_file = "btn-task.png"
+    duration = const.OPTION_TASK
 
 
 class ShortBreakButton(PomodoroButton):
     image_file = "btn-s-break.png"
+    duration = const.OPTION_SHORT_BREAK
 
 
 class LongBreakButton(PomodoroButton):
     image_file = "btn-l-break.png"
+    duration = const.OPTION_LONG_BREAK
 
 
-class PauseButton(Button):
+class PauseReplayButton(Button):
     theme = BUTTON_THEMES["PURPLE"]
     image_file = "btn-pause.png"
+
+    def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs):
+        super().__init__(parent=parent, command=command, **kwargs)
+        self.image_play = open_alpha_image(const.ASSETS_DIR.joinpath("btn-play.png"))
+        self._status = "play"
+
+        session.bind_event(Events.PAUSE_TIMER, self.on_pause)
+        session.bind_event(Events.UNPAUSE_TIMER, self.on_unpause)
+
+    def on_pause(self, _: tkinter.Event) -> None:
+        print("pause button")
+        self.configure(image=self.image_play)
+
+    def on_unpause(self, _: tkinter.Event) -> None:
+        print("unpause button")
+        self.configure(image=self.image)
 
 
 class StopButton(Button):
