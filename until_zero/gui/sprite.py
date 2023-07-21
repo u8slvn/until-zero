@@ -3,10 +3,13 @@ from __future__ import annotations
 import tkinter
 
 from itertools import cycle
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from until_zero import constants as const
-from until_zero.tools import open_alpha_image
+
+
+if TYPE_CHECKING:
+    from PIL import ImageTk
 
 
 class Sprite(tkinter.Label):
@@ -15,13 +18,13 @@ class Sprite(tkinter.Label):
         parent: tkinter.Misc,
         width: int,
         height: int,
-        frames: list[Path],
+        frames: list[ImageTk.PhotoImage],
         frame_rate: int,
     ):
         super().__init__(master=parent, width=width, height=height)
         self.width = width
         self.height = height
-        self._frames = [open_alpha_image(file) for file in frames]
+        self._frames = frames
         self.frames = cycle(self._frames)
         self.frame_rate = frame_rate
         self.configure(background=const.YELLOW)

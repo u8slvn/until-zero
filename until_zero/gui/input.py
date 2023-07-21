@@ -8,7 +8,7 @@ from typing import Callable
 from until_zero import constants as const
 
 
-class Input(tkinter.Entry):
+class TimersInput(tkinter.Entry):
     # https://regex101.com/r/Mf1U4z/1
     EXTRACT_REG = re.compile(r"(?:(\d+)(?::(\d+))?\+?)")
     # https://regex101.com/r/3RtSGv/1
@@ -48,7 +48,7 @@ class Input(tkinter.Entry):
             ]
         )
 
-    def get_timers(self) -> list[int] | None:
+    def get_durations(self) -> list[int] | None:
         string = self.input_var.get()
         matches = self.EXTRACT_REG.findall(string)
 
@@ -63,3 +63,7 @@ class Input(tkinter.Entry):
             return None
 
         return timers
+
+    def reset(self) -> None:
+        self.delete(0, tkinter.END)
+        self.insert(0, "")
