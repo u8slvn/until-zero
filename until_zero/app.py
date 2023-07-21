@@ -63,6 +63,7 @@ class App(tkinter.Tk):
     def on_stop_timers(self, _: tkinter.Event) -> None:
         self.timers_widget.destroy()
         self.deiconify()
+        self.config_timers.timers_input.focus_set()
 
 
 class ConfigTimersFrame(Frame):
@@ -105,7 +106,7 @@ class ConfigTimersFrame(Frame):
         timer_durations = self.timers_input.get_durations()
         sum_durations = session.set_timers(durations=timer_durations)
 
-        if sum_durations is None:
+        if sum_durations > 14400 * 60:
             self.timers_input.mark_as_error()
             text = const.SUM_TIMERS_ERROR
         else:
@@ -177,6 +178,8 @@ class TimersWidget(tkinter.Toplevel):
     def pause_replay_click(self) -> None:
         # Replay
         if self.timers_sequence.is_done():
+            session.send_event(Events.UNPAUSE_TIMER)
+            self.paused = False
             self.timers_sequence = session.get_timers_sequence()
             self.tick()
             return

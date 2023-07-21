@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from PIL import Image
@@ -13,10 +12,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def format_time_for_human(time: int) -> str:
-    sum_timers = timedelta(seconds=time)
-    days = sum_timers.days
-    hours, remainder = divmod(sum_timers.seconds, 3600)
+def format_time_for_human(time: int) -> str | None:
+    days, remainder = divmod(time, 86400)
+    hours, remainder = divmod(remainder, 3600)
     minutes, seconds = divmod(remainder, 60)
 
     human_td = []

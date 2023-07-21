@@ -11,8 +11,8 @@ from until_zero import constants as const
 class TimersInput(tkinter.Entry):
     # https://regex101.com/r/Mf1U4z/1
     EXTRACT_REG = re.compile(r"(?:(\d+)(?::(\d+))?\+?)")
-    # https://regex101.com/r/3RtSGv/1
-    CHECK_REG = re.compile(r"^(((\d+):(\d?(?!\d+:\d+)))|(\d+)\+?)+$")
+    # https://regex101.com/r/mnH1R8/1
+    CHECK_REG = re.compile(r"^(((\d+):(\d?(?!\d+:\d+)))|(\d+(?<!\d{5}))\+?)+$")
 
     def __init__(self, master: tkinter.Misc, update_callback: Callable[[], None]):
         self.input_var = tkinter.StringVar()

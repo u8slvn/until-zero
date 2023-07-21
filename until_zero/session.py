@@ -34,15 +34,12 @@ class _Session:
     def has_timers(self) -> bool:
         return len(self._timers) > 0
 
-    def set_timers(self, durations: list[int]) -> int | None:
+    def set_timers(self, durations: list[int]) -> int:
         self.clear_timers()
-        try:
-            sum_durations = sum(durations)
-            for duration in durations:
-                self._timers.append(Timer(duration=duration))
-            return sum_durations
-        except OverflowError:
-            return None
+        sum_durations = sum(durations)
+        for duration in durations:
+            self._timers.append(Timer(duration=duration))
+        return sum_durations
 
     def get_timers_sequence(self) -> TimersSequence:
         return TimersSequence(timers=self._timers)
