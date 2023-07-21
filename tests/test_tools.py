@@ -5,7 +5,7 @@ import pytest
 from PIL import ImageTk
 
 from tests import FIXTURES_DIR
-from until_zero.tools import format_timer_for_human
+from until_zero.tools import format_time_for_human
 from until_zero.tools import open_alpha_image
 
 
@@ -29,7 +29,7 @@ from until_zero.tools import open_alpha_image
     ],
 )
 def test_format_timer_for_human(timer, expected):
-    result = format_timer_for_human(timer=timer)
+    result = format_time_for_human(time=timer)
 
     assert result == expected
 

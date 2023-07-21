@@ -64,6 +64,6 @@ class TimersInput(tkinter.Entry):
 
         return timers
 
-    def reset(self) -> None:
+    def clean(self) -> None:
         self.delete(0, tkinter.END)
         self.insert(0, "")

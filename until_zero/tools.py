@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def format_timer_for_human(timer: int) -> str:
-    sum_timers = timedelta(seconds=timer)
+def format_time_for_human(time: int) -> str:
+    sum_timers = timedelta(seconds=time)
     days = sum_timers.days
     hours, remainder = divmod(sum_timers.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
