@@ -23,7 +23,7 @@ class Sprite(tkinter.Label):
         height: int,
         frames: list[ImageTk.PhotoImage],
         frame_rate: int,
-    ):
+    ) -> None:
         super().__init__(master=parent, width=width, height=height)
         self.width = width
         self.height = height
@@ -52,7 +52,7 @@ class Sprite(tkinter.Label):
 
 
 class BongoCat(Sprite):
-    def __init__(self, parent: tkinter.Misc):
+    def __init__(self, parent: tkinter.Misc) -> None:
         frames = [
             open_alpha_image(const.ASSETS_DIR.joinpath("bongo-cat-0.png")),
             open_alpha_image(const.ASSETS_DIR.joinpath("bongo-cat-1.png")),

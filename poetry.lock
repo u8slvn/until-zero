@@ -485,6 +485,17 @@ files = [
 ]
 
 [[package]]
+name = "types-playsound"
+version = "1.3.1.3"
+description = "Typing stubs for playsound"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-playsound-1.3.1.3.tar.gz", hash = "sha256:0a856b540ca4c61805d17ed9d8a838cb351355d9f78ce3c612ee208a3d6d93ab"},
+    {file = "types_playsound-1.3.1.3-py3-none-any.whl", hash = "sha256:6d055a2e276ed4d86c03e7fe4b3c4a5f50e00f73ae0d1104b1f353e10cb08caf"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.7.1"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -518,4 +529,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "689b98eea26ca01f7111d43cd10579040b0571d787fe8ce37d4881e018b573a8"
+content-hash = "8f07211d40a67984faabc944c76994157af11f269033f8a9c3c70c814c1bab96"

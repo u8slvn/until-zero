@@ -37,7 +37,7 @@ class Timer:
 
 class TimersSequence:
     def __init__(self, timers: list[Timer]):
-        def timers_iterator() -> Generator[Timer]:
+        def timers_iterator() -> Generator[Timer, None, None]:
             for timer in timers:
                 yield timer
 

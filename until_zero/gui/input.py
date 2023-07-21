@@ -48,19 +48,16 @@ class TimersInput(tkinter.Entry):
             ]
         )
 
-    def get_durations(self) -> list[int] | None:
+    def get_durations(self) -> list[int]:
         string = self.input_var.get()
         matches = self.EXTRACT_REG.findall(string)
 
         timers = []
-        try:
-            for match in matches:
-                m, s = match
-                timer = int(m) * 60
-                timer += int(s) if s.isdigit() else 0
-                timers.append(timer)
-        except OverflowError:
-            return None
+        for match in matches:
+            m, s = match
+            timer = int(m) * 60
+            timer += int(s) if s.isdigit() else 0
+            timers.append(timer)
 
         return timers
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import tkinter
 
 from functools import partial
+from typing import Any
 from typing import Callable
 
 from until_zero import constants as const
@@ -34,12 +35,12 @@ BUTTON_THEMES = {
 
 
 class Button(tkinter.Button):
-    theme: dict[str, str]
+    theme: dict[str, Any]
     image_file: str
 
-    def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs):
+    def __init__(self, parent: tkinter.Misc, **kwargs) -> None:
         self.image = open_alpha_image(const.ASSETS_DIR.joinpath(self.image_file))
-        super().__init__(master=parent, image=self.image, command=command, **kwargs)
+        super().__init__(master=parent, image=self.image, **kwargs)
         self.configure(relief=tkinter.GROOVE, **self.theme)
 
 
@@ -57,7 +58,7 @@ class PomodoroButton(Button):
     theme = BUTTON_THEMES["PURPLE"]
     duration: int
 
-    def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs):
+    def __init__(self, parent: tkinter.Misc, command: Callable[[int], None], **kwargs) -> None:
         super().__init__(parent=parent, command=partial(command, self.duration), **kwargs)
 
 
@@ -80,7 +81,7 @@ class PauseReplayButton(Button):
     theme = BUTTON_THEMES["PURPLE"]
     image_file = "btn-pause.png"
 
-    def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs):
+    def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs) -> None:
         super().__init__(parent=parent, command=command, **kwargs)
         self.image_play = open_alpha_image(const.ASSETS_DIR.joinpath("btn-play.png"))
         self.image_replay = open_alpha_image(const.ASSETS_DIR.joinpath("btn-replay.png"))
