@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-def format_time_for_human(time: int) -> str | None:
+def format_time_for_human(time: int) -> str:
     days, remainder = divmod(time, 86400)
     hours, remainder = divmod(remainder, 3600)
     minutes, seconds = divmod(remainder, 60)

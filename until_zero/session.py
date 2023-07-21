@@ -18,6 +18,12 @@ class _Session:
         self._root: tkinter.Tk | None = None
         self._timers: list[Timer] = []
 
+    @property
+    def root(self) -> tkinter.Tk:
+        if self._root is None:
+            raise Exception("Session used without Tk scope.")
+        return self._root
+
     def register_root(self, root: tkinter.Tk) -> None:
         self._root = root
         for v_event in Events:
@@ -26,10 +32,10 @@ class _Session:
         self.bind_event(Events.TIMERS_STOPPED, self.reset_timers)
 
     def bind_event(self, event: Events, callback: Callable[[tkinter.Event], None]) -> None:
-        self._root.bind(event, callback, add="+")
+        self.root.bind(event, callback, add="+")
 
     def send_event(self, event: Events) -> None:
-        self._root.event_generate(event)
+        self.root.event_generate(event)
 
     def has_timers(self) -> bool:
         return len(self._timers) > 0

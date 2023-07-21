@@ -61,7 +61,8 @@ class App(tkinter.Tk):
         self.withdraw()
 
     def on_stop_timers(self, _: tkinter.Event) -> None:
-        self.timers_widget.destroy()
+        if self.timers_widget is not None:
+            self.timers_widget.destroy()
         self.deiconify()
         self.config_timers.timers_input.focus_set()
 

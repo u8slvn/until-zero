@@ -8,11 +8,11 @@ from until_zero import constants as const
 
 
 if TYPE_CHECKING:
-    pass
+    from until_zero.app import App
 
 
 class Frame(tkinter.Frame):
-    def __init__(self, app, rows: int, columns: int):
+    def __init__(self, app: App, rows: int, columns: int):
         super().__init__(master=app)
         self.app = app
         self.rows = rows

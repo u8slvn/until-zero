@@ -9,11 +9,11 @@ from until_zero.tools import open_alpha_image
 
 
 if TYPE_CHECKING:
-    pass
+    from until_zero.app import TimersWidget
 
 
 class Draggable(tkinter.Label):
-    def __init__(self, parent, width: int) -> None:
+    def __init__(self, parent: TimersWidget, width: int) -> None:
         super().__init__(master=parent)
         self.parent = parent
         self.root = self.parent.winfo_toplevel()
@@ -40,7 +40,7 @@ class Draggable(tkinter.Label):
 
     def on_hold(self, _: tkinter.Event) -> None:
         mouse_x, mouse_y = self.parent.winfo_pointerxy()
-        _, root_x, root_y = self.root.geometry().split("+")
+        dimension, root_x, root_y = self.root.geometry().split("+")
         self.pos_x = mouse_x - int(root_x)
         self.pos_y = mouse_y - int(root_y)
 
