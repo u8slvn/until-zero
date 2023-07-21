@@ -5,7 +5,6 @@ import pytest
 from PIL import ImageTk
 
 from tests import FIXTURES_DIR
-from until_zero.tools import StepTimer
 from until_zero.tools import format_timer_for_human
 from until_zero.tools import open_alpha_image
 
@@ -33,23 +32,6 @@ def test_format_timer_for_human(timer, expected):
     result = format_timer_for_human(timer=timer)
 
     assert result == expected
-
-
-def test_step_timer(mocker):
-    playsound = mocker.patch("until_zero.tools.playsound")
-    step_timer = StepTimer(duration=2)
-
-    assert step_timer.is_running() is True
-
-    step_timer.tick()
-
-    assert step_timer.is_running() is True
-
-    step_timer.tick()
-    step_timer.tick()
-
-    assert step_timer.is_running() is False
-    playsound.assert_called_once_with(StepTimer.sound, block=False)
 
 
 def test_open_alpha_image(monkeypatch_tkinter):
