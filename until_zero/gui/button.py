@@ -83,18 +83,21 @@ class PauseReplayButton(Button):
     def __init__(self, parent: tkinter.Misc, command: Callable[[], None], **kwargs):
         super().__init__(parent=parent, command=command, **kwargs)
         self.image_play = open_alpha_image(const.ASSETS_DIR.joinpath("btn-play.png"))
+        self.image_replay = open_alpha_image(const.ASSETS_DIR.joinpath("btn-replay.png"))
         self._status = "play"
 
         session.bind_event(Events.PAUSE_TIMER, self.on_pause)
         session.bind_event(Events.UNPAUSE_TIMER, self.on_unpause)
+        session.bind_event(Events.TIMERS_STOPPED, self.on_timers_stop)
 
     def on_pause(self, _: tkinter.Event) -> None:
-        print("pause button")
         self.configure(image=self.image_play)
 
     def on_unpause(self, _: tkinter.Event) -> None:
-        print("unpause button")
         self.configure(image=self.image)
+
+    def on_timers_stop(self, _: tkinter.Event) -> None:
+        self.configure(image=self.image_replay)
 
 
 class StopButton(Button):
