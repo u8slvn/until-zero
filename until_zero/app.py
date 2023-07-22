@@ -205,5 +205,5 @@ class TimersWidget(tkinter.Toplevel):
             session.send_event(Events.TIMERS_STOPPED)
 
     def update_timer_label(self) -> None:
-        text = self.timers_sequence.get_human_readable_duration()
+        text = self.timers_sequence.get_current_time_as_text()
         self.timer_label.update_text(text=text)
