@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 from PIL import Image
 from PIL import ImageTk
 
-from until_zero import constants as const
-
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -24,11 +22,8 @@ def format_time_for_human(time: int) -> str:
         human_td.append(f"{hours}h")
     if minutes > 0:
         human_td.append(f"{minutes}m")
-    if seconds > 0:
+    if seconds > 0 or len(human_td) == 0:
         human_td.append(f"{seconds}s")
-
-    if not human_td:
-        return const.SUM_TIMERS_PLACEHOLDER
 
     return ", ".join(human_td)
 

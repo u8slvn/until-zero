@@ -41,3 +41,9 @@ force-single-line = true
 lines-between-types = 1
 lines-after-imports = 2
 required-imports = ["from __future__ import annotations"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pass",
+    "if TYPE_CHECKING:",
+]
