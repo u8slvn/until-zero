@@ -64,7 +64,7 @@ class TimersSequence:
         if self._current.is_ended():
             self._current = self._get_next_timer()
 
-    def get_human_readable_duration(self) -> str:
+    def get_current_time_as_text(self) -> str:
         if self._current is None:
             return "ZER0"
 
