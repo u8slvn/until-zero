@@ -59,8 +59,6 @@ class TimersSequence:
             self._running = False
             return
 
-        print("tick")
-
         self._current.tick()
 
         if self._current.is_ended():

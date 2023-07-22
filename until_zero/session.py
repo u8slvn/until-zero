@@ -9,7 +9,7 @@ from until_zero.timer import Timer
 from until_zero.timer import TimersSequence
 
 
-class TimersDurationOverFlow(Exception):
+class SessionNotRegistered(Exception):
     pass
 
 
@@ -21,13 +21,13 @@ class _Session:
     @property
     def root(self) -> tkinter.Tk:
         if self._root is None:
-            raise Exception("Session used without Tk scope.")
+            raise SessionNotRegistered("Session used without Tk scope.")
         return self._root
 
     def register_root(self, root: tkinter.Tk) -> None:
         self._root = root
-        for v_event in Events:
-            self._root.event_add(v_event, "None")
+        for event in Events:
+            self._root.event_add(event, "None")
 
         self.bind_event(Events.TIMERS_STOPPED, self.reset_timers)
 
