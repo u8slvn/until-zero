@@ -16,7 +16,7 @@ def clean_tkinter():
 
 @pytest.fixture
 def test_tkinter(monkeypatch, mocker):
-    monkeypatch.setattr(tkinter, "_default_root", mocker.Mock())
+    monkeypatch.setattr(tkinter, "_default_root", mocker.MagicMock())
 
 
 class TestApp(tkinter.Tk):
