@@ -34,7 +34,7 @@ def test_format_timer_for_human(timer, expected):
     assert result == expected
 
 
-def test_open_alpha_image(monkeypatch_tkinter):
+def test_open_alpha_image(test_tkinter):
     image = open_alpha_image(FIXTURES_DIR.joinpath("test-alpha-image.png"))
 
     assert isinstance(image, ImageTk.PhotoImage)

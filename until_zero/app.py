@@ -41,7 +41,7 @@ class App(tkinter.Tk):
         self.position_window()
 
         # --- Frames
-        self.config_timers = ConfigTimersFrame(app=self)
+        self.config_timers = ConfigTimersFrame(self)
         self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
 
         self.timers_widget: TimersWidget | None = None
@@ -68,8 +68,8 @@ class App(tkinter.Tk):
 
 
 class ConfigTimersFrame(Frame):
-    def __init__(self, app: App):
-        super().__init__(app=app, rows=5, columns=3)
+    def __init__(self, parent: tkinter.Tk):
+        super().__init__(parent=parent, rows=5, columns=3)
 
         # --- Labels
         self.steps_label = Label(self, text="STEPS:")
@@ -126,8 +126,8 @@ class ConfigTimersFrame(Frame):
 
 
 class TimersWidget(tkinter.Toplevel):
-    def __init__(self, app: App) -> None:
-        super().__init__(master=app)
+    def __init__(self, parent: tkinter.Tk) -> None:
+        super().__init__(master=parent)
         self.paused = False
         self.width = const.WINDOW_TIMER_WIDTH
         self.height = const.WINDOW_TIMER_HEIGHT

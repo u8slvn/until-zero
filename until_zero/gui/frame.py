@@ -2,19 +2,12 @@ from __future__ import annotations
 
 import tkinter
 
-from typing import TYPE_CHECKING
-
 from until_zero import constants as const
 
 
-if TYPE_CHECKING:
-    from until_zero.app import App
-
-
 class Frame(tkinter.Frame):
-    def __init__(self, app: App, rows: int, columns: int):
-        super().__init__(master=app)
-        self.app = app
+    def __init__(self, parent: tkinter.Tk, rows: int, columns: int):
+        super().__init__(master=parent)
         self.rows = rows
         self.columns = columns
         self._configure_grid()
