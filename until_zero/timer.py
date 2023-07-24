@@ -10,7 +10,7 @@ from until_zero.tools import format_time_for_human
 
 class Timer:
     tick_duration = 1000
-    sound = str(const.ASSETS_DIR.joinpath("bip.wav"))
+    sound = str(const.ASSETS_DIR.joinpath("bip.mp3"))
 
     def __init__(self, duration: int) -> None:
         self.paused = True
