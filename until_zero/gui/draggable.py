@@ -3,6 +3,7 @@ from __future__ import annotations
 import tkinter
 
 from typing import TYPE_CHECKING
+from typing import Callable
 
 from until_zero import constants as const
 from until_zero.tools import open_alpha_image
@@ -13,11 +14,10 @@ if TYPE_CHECKING:
 
 
 class Draggable(tkinter.Label):
-    def __init__(self, parent: TimersWidget, width: int) -> None:
+    def __init__(self, parent: TimersWidget, reset_pos_callback: Callable[[], None]) -> None:
         super().__init__(master=parent)
         self.parent = parent
         self.root = self.parent.winfo_toplevel()
-        self.width = width
         self.pos_x = 0
         self.pos_y = 0
         self.grid_rowconfigure(0, weight=1)
@@ -36,7 +36,7 @@ class Draggable(tkinter.Label):
         self.bind("<Button-1>", self.on_hold)
         self.bind("<ButtonRelease-1>", self.on_release)
         self.bind("<B1-Motion>", self.on_drag)
-        self.bind("<Double-Button-1>", self.reset_parent_pos)
+        self.bind("<Double-Button-1>", reset_pos_callback)
 
     def on_hold(self, _: tkinter.Event) -> None:
         mouse_x, mouse_y = self.parent.winfo_pointerxy()
@@ -45,14 +45,11 @@ class Draggable(tkinter.Label):
         self.pos_y = mouse_y - int(root_y)
 
     def on_drag(self, event: tkinter.Event) -> None:
-        x = event.x_root - self.pos_x - self.winfo_rootx() + self.winfo_rootx()
-        y = event.y_root - self.pos_y - self.winfo_rooty() + self.winfo_rooty()
+        x = event.x_root - self.pos_x
+        y = event.y_root - self.pos_y
 
-        self.parent.geometry("+%i+%i" % (x, y))
+        self.parent.geometry(f"+{x}+{y}")
 
     def on_release(self, _: tkinter.Event) -> None:
         self.pos_x = 0
         self.pos_y = 0
-
-    def reset_parent_pos(self, _: tkinter.Event) -> None:
-        self.parent.position_window()

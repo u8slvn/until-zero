@@ -54,7 +54,7 @@ class App(tkinter.Tk):
         self.update()
         x = (self.winfo_screenwidth() - self.winfo_width()) // 2
         y = (self.winfo_screenheight() - self.winfo_height()) // 2
-        self.geometry("+%d+%d" % (x, y))
+        self.geometry(f"+{x}+{y}")
 
     def on_start_timers(self, _: tkinter.Event) -> None:
         self.timers_widget = TimersWidget(self)
@@ -153,12 +153,12 @@ class TimersWidget(tkinter.Toplevel):
         self.bongo_cat = BongoCat(self)
 
         # --- Draggable
-        self.draggable = Draggable(self, width=10)
+        self.draggable = Draggable(self, reset_pos_callback=self.position_window)
 
         self._configure_component_grid()
         self.tick()
 
-    def position_window(self) -> None:
+    def position_window(self, _: tkinter.Event = None) -> None:
         self.update_idletasks()
         x = (self.winfo_screenwidth() - self.winfo_width()) // 2
         y = 0

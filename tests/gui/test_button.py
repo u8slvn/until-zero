@@ -14,11 +14,11 @@ from until_zero.gui.button import PauseReplayButton
         (Events.UNPAUSE_TIMER, "image"),
     ],
 )
-def test_pause_replay_button_on_events(mocker, monkeypatch, test_session, event, image_name):
+def test_pause_replay_button_on_events(mocker, test_session, event, image_name):
     mocker.patch("until_zero.gui.button.session", test_session)
     test_session.root.add_test_action(test_session.send_event, event)
     pause_replay_btn = PauseReplayButton(test_session.root, command=mocker.Mock())
-    monkeypatch.setattr(pause_replay_btn, "configure", mocker.Mock())
+    setattr(pause_replay_btn, "configure", mocker.Mock())
 
     test_session.root.run_test_actions()
 
