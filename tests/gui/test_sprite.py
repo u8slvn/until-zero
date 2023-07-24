@@ -69,10 +69,11 @@ def test_sprite_anime_frames(mocker, monkeypatch, sprite_app):
 )
 def test_bongo_cat_stop_or_start_on_event(mocker, monkeypatch, test_session, action, event):
     mocker.patch("until_zero.gui.sprite.session", test_session)
-    test_session.root.add_test_action(test_session.send_event, event)
-    bongo_cat = BongoCat(test_session.root)
+    app = test_session.root
+    app.add_test_action(test_session.send_event, event)
+    bongo_cat = BongoCat(app)
     monkeypatch.setattr(bongo_cat, action, mocker.Mock())
 
-    test_session.root.run_test_actions()
+    app.run_test_actions()
 
     getattr(bongo_cat, action).assert_called_once()
