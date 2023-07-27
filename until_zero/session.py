@@ -37,8 +37,12 @@ class _Session:
     def send_event(self, event: Events) -> None:
         self.root.event_generate(event)
 
+    @property
+    def timer_count(self) -> int:
+        return len(self._timers)
+
     def has_timers(self) -> bool:
-        return len(self._timers) > 0
+        return self.timer_count > 0
 
     def set_timers(self, durations: list[int]) -> int:
         self.clear_timers()

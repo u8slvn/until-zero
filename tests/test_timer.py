@@ -58,10 +58,14 @@ class TestTimerSequence:
         timers_sequence = TimersSequence(timers=[Timer(1), Timer(1)])
 
         assert timers_sequence.is_done() is False
+        assert timers_sequence.get_current_timer_index() == 1
 
         timers_sequence.tick()
         timers_sequence.tick()
         timers_sequence.tick()
+
+        assert timers_sequence.get_current_timer_index() == 2
+
         timers_sequence.tick()
         timers_sequence.tick()
         timers_sequence.tick()
@@ -72,7 +76,7 @@ class TestTimerSequence:
     def test_get_current_time_as_text(self, playsound):
         timers_sequence = TimersSequence(timers=[Timer(1)])
 
-        time_text = timers_sequence.get_current_time_as_text()
+        time_text = timers_sequence.get_current_timer_time_as_text()
 
         assert time_text == "1s"
 
@@ -80,6 +84,6 @@ class TestTimerSequence:
         timers_sequence.tick()
         timers_sequence.tick()
 
-        time_text = timers_sequence.get_current_time_as_text()
+        time_text = timers_sequence.get_current_timer_time_as_text()
 
         assert time_text == "ZER0"
