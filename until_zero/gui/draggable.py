@@ -14,7 +14,9 @@ if TYPE_CHECKING:
 
 
 class Draggable(tkinter.Label):
-    def __init__(self, parent: TimersWidget, reset_pos_callback: Callable[[], None]) -> None:
+    def __init__(
+        self, parent: TimersWidget, reset_pos_callback: Callable[[tkinter.Event], None]
+    ) -> None:
         super().__init__(master=parent)
         self.parent = parent
         self.root = self.parent.winfo_toplevel()

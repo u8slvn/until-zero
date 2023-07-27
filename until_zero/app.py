@@ -12,11 +12,10 @@ from until_zero.gui.button import StartButton
 from until_zero.gui.button import StopButton
 from until_zero.gui.button import TaskButton
 from until_zero.gui.draggable import Draggable
-from until_zero.gui.frame import Frame
 from until_zero.gui.input import TimersInput
 from until_zero.gui.label import Label
-from until_zero.gui.label import TimerLabel
 from until_zero.gui.sprite import BongoCat
+from until_zero.gui.timer_display import TimerDisplay
 from until_zero.session import session
 from until_zero.tools import format_time_for_human
 from until_zero.tools import open_alpha_image
@@ -67,9 +66,12 @@ class App(tkinter.Tk):
         self.config_timers.timers_input.focus_set()
 
 
-class ConfigTimersFrame(Frame):
+class ConfigTimersFrame(tkinter.Frame):
     def __init__(self, parent: tkinter.Tk):
-        super().__init__(parent=parent, rows=5, columns=3)
+        super().__init__(master=parent)
+        self.rows = 5
+        self.columns = 3
+        self.configure(background=const.YELLOW)
 
         # --- Labels
         self.steps_label = Label(self, text="STEPS:")
@@ -89,6 +91,11 @@ class ConfigTimersFrame(Frame):
         self._configure_component_grid()
 
     def _configure_component_grid(self):
+        for row_index in range(self.rows):
+            self.grid_rowconfigure(row_index, weight=1)
+        for col_index in range(self.columns):
+            self.grid_columnconfigure(col_index, weight=1)
+
         # --- Row 0
         self.steps_label.grid(row=0, column=0, padx=5, pady=0, sticky=tkinter.W)
         self.clean_btn.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
@@ -142,8 +149,8 @@ class TimersWidget(tkinter.Toplevel):
         self.grid_columnconfigure(1, weight=1)
         self.position_window()
 
-        # --- Labels
-        self.timer_label = TimerLabel(self, text="", size=10)
+        # --- Timer display
+        self.timer_display = TimerDisplay(parent=self, timer_count=session.timer_count)
 
         # --- Buttons
         self.pause_btn = PauseReplayButton(self, command=self.pause_replay_click)
@@ -158,7 +165,7 @@ class TimersWidget(tkinter.Toplevel):
         self._configure_component_grid()
         self.tick()
 
-    def position_window(self, _: tkinter.Event = None) -> None:
+    def position_window(self, _: tkinter.Event | None = None) -> None:
         self.update_idletasks()
         x = (self.winfo_screenwidth() - self.winfo_width()) // 2
         y = 0
@@ -168,7 +175,7 @@ class TimersWidget(tkinter.Toplevel):
         # --- Column 0
         self.pause_btn.grid(row=0, column=0, padx=5, pady=5, sticky=tkinter.W)
         # --- Column 1
-        self.timer_label.grid(row=0, column=1, padx=5, pady=0, sticky=tkinter.EW)
+        self.timer_display.grid(row=0, column=1, padx=0, pady=3, sticky=tkinter.NSEW)
         # --- Column 2
         self.bongo_cat.grid(row=0, column=2, padx=5, pady=0, sticky=tkinter.E)
         # --- Column 3
@@ -205,5 +212,9 @@ class TimersWidget(tkinter.Toplevel):
             session.send_event(Events.TIMERS_STOPPED)
 
     def update_timer_label(self) -> None:
-        text = self.timers_sequence.get_current_time_as_text()
-        self.timer_label.update_text(text=text)
+        time = self.timers_sequence.get_current_timer_time_as_text()
+        timer_index = self.timers_sequence.get_current_timer_index()
+        self.timer_display.update_labels(
+            time=time,
+            timer_index=timer_index,
+        )

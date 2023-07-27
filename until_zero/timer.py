@@ -42,7 +42,8 @@ class TimersSequence:
                 yield timer
 
         self._timers = timers_iterator()
-        self._current: Timer | None = self._get_next_timer()
+        self._current_timer_index = 1
+        self._current_timer: Timer | None = self._get_next_timer()
         self._running = True
 
     def _get_next_timer(self) -> Timer | None:
@@ -55,17 +56,21 @@ class TimersSequence:
         return not self._running
 
     def tick(self):
-        if self._current is None:
+        if self._current_timer is None:
             self._running = False
             return
 
-        self._current.tick()
+        self._current_timer.tick()
 
-        if self._current.is_ended():
-            self._current = self._get_next_timer()
+        if self._current_timer.is_ended():
+            self._current_timer = self._get_next_timer()
+            self._current_timer_index += 1
 
-    def get_current_time_as_text(self) -> str:
-        if self._current is None:
+    def get_current_timer_time_as_text(self) -> str:
+        if self._current_timer is None:
             return "ZER0"
 
-        return format_time_for_human(time=self._current.time)
+        return format_time_for_human(time=self._current_timer.time)
+
+    def get_current_timer_index(self) -> int:
+        return self._current_timer_index
