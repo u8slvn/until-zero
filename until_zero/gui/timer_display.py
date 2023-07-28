@@ -7,13 +7,13 @@ from until_zero.gui.label import TimerLabel
 
 
 class TimerDisplay(tkinter.Frame):
-    def __init__(self, parent: tkinter.Misc, timer_count: int) -> None:
+    def __init__(self, parent: tkinter.Misc) -> None:
         super().__init__(master=parent)
         self.configure(background=const.BLACK)
 
         self.time_label = TimerLabel(self)
         self.time_label.configure(background=const.BLACK)
-        self.timer_progress = TimersProgress(self, timer_count=timer_count)
+        self.timer_progress = TimersProgress(self)
 
         self._configure_component_grid()
 
@@ -27,14 +27,20 @@ class TimerDisplay(tkinter.Frame):
         self.time_label.update_text(text=time)
         self.timer_progress.update_progress(timer_index=timer_index)
 
+    def set_timer_count(self, count: int) -> None:
+        self.timer_progress.timer_count = count
+
 
 class TimersProgress(tkinter.Canvas):
-    def __init__(self, parent: tkinter.Misc, timer_count: int) -> None:
+    def __init__(self, parent: tkinter.Misc) -> None:
         self.height = 2
         super().__init__(master=parent, height=self.height, highlightthickness=0, relief="ridge")
         self.configure(background=const.BLACK, border=0)
-        self.timer_count = timer_count
+        self.timer_count = 0
         self.separator = 2
+
+    def set_timer_count(self, count: int) -> None:
+        self.timer_count = count
 
     def update_progress(self, timer_index: int) -> None:
         self.update_idletasks()
