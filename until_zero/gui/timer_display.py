@@ -42,6 +42,12 @@ class TimersProgress(tkinter.Canvas):
         rect_size = (width - (self.timer_count - 1) * self.separator) / self.timer_count
         x = 0.0
         for i in range(self.timer_count):
-            fill = const.BLUE if i >= (self.timer_count - timer_index) else const.WHITE
+            if i > (self.timer_count - timer_index):
+                fill = const.BLUE
+            elif i == (self.timer_count - timer_index):
+                fill = const.PURPLE
+            else:
+                fill = const.WHITE
+
             self.create_rectangle(x, 0, x + rect_size, self.height, fill=fill, outline="")
             x += rect_size + self.separator
