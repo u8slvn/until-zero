@@ -41,7 +41,7 @@ class TimersProgress(tkinter.Canvas):
         width = self.winfo_width()
         rect_size = (width - (self.timer_count - 1) * self.separator) / self.timer_count
         x = 0.0
-        for i in range(self.timer_count):
+        for i in reversed(range(self.timer_count)):
             if i > (self.timer_count - timer_index):
                 fill = const.BLUE
             elif i == (self.timer_count - timer_index):
