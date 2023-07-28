@@ -126,9 +126,9 @@ class ConfigTimersFrame(tkinter.Frame):
     def add_pomodoro_timer(self, option: int) -> None:
         timers_input = self.timers_input.input_var.get()
         if timers_input != "":
-            self.timers_input.input_var.set(f"{timers_input}+{option}")
+            self.timers_input.insert("end", f"+{option}")
         else:
-            self.timers_input.input_var.set(str(option))
+            self.timers_input.insert("end", str(option))
         self.timers_input.icursor(tkinter.END)
 
 
