@@ -2,20 +2,15 @@ from __future__ import annotations
 
 import tkinter
 
-from typing import TYPE_CHECKING
 from typing import Callable
 
 from until_zero import constants as const
 from until_zero.tools import open_alpha_image
 
 
-if TYPE_CHECKING:
-    from until_zero.app import TimersWidget
-
-
 class Draggable(tkinter.Label):
     def __init__(
-        self, parent: TimersWidget, reset_pos_callback: Callable[[tkinter.Event], None]
+        self, parent: tkinter.Toplevel, reset_pos_callback: Callable[[tkinter.Event], None]
     ) -> None:
         super().__init__(master=parent)
         self.parent = parent

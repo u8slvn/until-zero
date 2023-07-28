@@ -43,7 +43,8 @@ class App(tkinter.Tk):
         self.config_timers = ConfigTimersFrame(self)
         self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
 
-        self.timers_widget: TimersWidget | None = None
+        # --- Timers window
+        self.timers_widget = TimersWindow(self)
 
         # --- Events
         self.bind(Events.START_TIMERS, self.on_start_timers)
@@ -56,12 +57,11 @@ class App(tkinter.Tk):
         self.geometry(f"+{x}+{y}")
 
     def on_start_timers(self, _: tkinter.Event) -> None:
-        self.timers_widget = TimersWidget(self)
+        self.timers_widget.start()
         self.withdraw()
 
     def on_stop_timers(self, _: tkinter.Event) -> None:
-        if self.timers_widget is not None:
-            self.timers_widget.destroy()
+        self.timers_widget.stop()
         self.deiconify()
         self.config_timers.timers_input.focus_set()
 
@@ -132,7 +132,7 @@ class ConfigTimersFrame(tkinter.Frame):
         self.timers_input.icursor(tkinter.END)
 
 
-class TimersWidget(tkinter.Toplevel):
+class TimersWindow(tkinter.Toplevel):
     def __init__(self, parent: tkinter.Tk) -> None:
         super().__init__(master=parent)
         self.paused = False
@@ -145,12 +145,10 @@ class TimersWidget(tkinter.Toplevel):
         self.overrideredirect(True)
         self.attributes("-topmost", True)
         self.configure(background=const.YELLOW)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
         self.position_window()
 
         # --- Timer display
-        self.timer_display = TimerDisplay(parent=self, timer_count=session.timer_count)
+        self.timer_display = TimerDisplay(parent=self)
 
         # --- Buttons
         self.pause_btn = PauseReplayButton(self, command=self.pause_replay_click)
@@ -163,7 +161,18 @@ class TimersWidget(tkinter.Toplevel):
         self.draggable = Draggable(self, reset_pos_callback=self.position_window)
 
         self._configure_component_grid()
+        self.withdraw()
+
+    def start(self) -> None:
+        self.paused = False
+        self.deiconify()
+        self.timer_display.set_timer_count(count=session.timer_count)
+        self.timers_sequence = session.get_timers_sequence()
         self.tick()
+
+    def stop(self) -> None:
+        self.paused = True
+        self.withdraw()
 
     def position_window(self, _: tkinter.Event | None = None) -> None:
         self.update_idletasks()
@@ -172,6 +181,9 @@ class TimersWidget(tkinter.Toplevel):
         self.geometry(f"+{x}+{y}")
 
     def _configure_component_grid(self) -> None:
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+
         # --- Column 0
         self.pause_btn.grid(row=0, column=0, padx=5, pady=5, sticky=tkinter.W)
         # --- Column 1
