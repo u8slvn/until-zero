@@ -1,0 +1,72 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  tests:
+    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+    runs-on: ${{ matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+        os: [ Ubuntu, macOS, Windows ]
+        include:
+          - os: Ubuntu
+            image: ubuntu-22.04
+          - os: Windows
+            image: windows-2022
+          - os: macOS
+            image: macos-12
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup headless display
+      uses: pyvista/setup-headless-display-action@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python - -y
+
+    - name: Update poetry path
+      if: ${{ matrix.os != 'Windows' }}
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Update poetry path for windows
+      if: ${{ matrix.os == 'Windows' }}
+      run: echo "$APPDATA\Python\Scripts" >> $GITHUB_PATH
+
+    - name: Configure poetry
+      run: poetry config virtualenvs.in-project true
+
+    - name: Install dependencies
+      run: poetry install
+
+    - name: Check quality
+      run: |
+        poetry run pre-commit run --all-files
+
+    - name: Check tests
+      run: |
+        poetry run mypy
+        poetry run pytest --cov until_zero
+
+    - name: Publish coverage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: github.event_name != 'pull_request'
+      run: |
+        pip install coveralls
+        coveralls --service=github
