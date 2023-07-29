@@ -28,8 +28,8 @@ def test_validate_timers_input(value, result):
     assert TimersInput.validate_timers_input(value=value) is result
 
 
-def test_get_durations(mocker, test_session):
-    timers_input = TimersInput(test_session.root, mocker.MagicMock())
+def test_get_durations(mocker, neutral_test_session):
+    timers_input = TimersInput(neutral_test_session.root, mocker.MagicMock())
     timers_input.input_var.get = mocker.Mock(return_value="100+10:10+1+10:5")
 
     result = timers_input.get_durations()
@@ -37,8 +37,8 @@ def test_get_durations(mocker, test_session):
     assert result == [6000, 610, 60, 605]
 
 
-def test_clean(mocker, test_session):
-    timers_input = TimersInput(test_session.root, mocker.MagicMock())
+def test_clean(mocker, neutral_test_session):
+    timers_input = TimersInput(neutral_test_session.root, mocker.MagicMock())
     timers_input.insert(0, "hello")
 
     timers_input.clean()
@@ -46,8 +46,8 @@ def test_clean(mocker, test_session):
     assert timers_input.get() == ""
 
 
-def test_mark_as_status(mocker, test_session):
-    timers_input = TimersInput(test_session.root, mocker.MagicMock())
+def test_mark_as_status(mocker, neutral_test_session):
+    timers_input = TimersInput(neutral_test_session.root, mocker.MagicMock())
 
     timers_input.mark_as_error()
 

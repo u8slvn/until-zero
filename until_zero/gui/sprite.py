@@ -31,7 +31,7 @@ class Sprite(tkinter.Label):
         self.frames = cycle(self._frames)
         self.frame_rate = frame_rate
         self.configure(background=const.YELLOW)
-        self.stopped = False
+        self.stopped = True
 
         self.start()
 
