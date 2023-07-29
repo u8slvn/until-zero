@@ -9,25 +9,15 @@ from until_zero.timer import Timer
 from until_zero.timer import TimersSequence
 
 
-class SessionNotRegistered(Exception):
-    pass
-
-
-class _Session:
-    def __init__(self) -> None:
-        self._root: tkinter.Tk | None = None
+class Session:
+    def __init__(self, root: tkinter.Tk) -> None:
+        self.root: tkinter.Tk = root
         self._timers: list[Timer] = []
+        self.setup_event()
 
-    @property
-    def root(self) -> tkinter.Tk:
-        if self._root is None:
-            raise SessionNotRegistered("Session used without Tk scope.")
-        return self._root
-
-    def register_root(self, root: tkinter.Tk) -> None:
-        self._root = root
+    def setup_event(self) -> None:
         for event in Events:
-            self._root.event_add(event, "None")
+            self.root.event_add(event, "None")
 
         self.bind_event(Events.TIMERS_STOPPED, self.reset_timers)
 
@@ -71,6 +61,3 @@ class _Session:
         self.reset_timers()
 
         self.send_event(event=Events.STOP_TIMERS)
-
-
-session = _Session()
