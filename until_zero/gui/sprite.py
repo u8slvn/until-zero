@@ -7,12 +7,13 @@ from typing import TYPE_CHECKING
 
 from until_zero import constants as const
 from until_zero.session import Events
-from until_zero.session import session
 from until_zero.tools import open_alpha_image
 
 
 if TYPE_CHECKING:
     from PIL import ImageTk
+
+    from until_zero.session import Session
 
 
 class Sprite(tkinter.Label):
@@ -60,6 +61,7 @@ class BongoCat(Sprite):
         ]
         super().__init__(parent=parent, width=38, height=30, frames=frames, frame_rate=150)
 
+    def bind_session(self, session: Session) -> None:
         session.bind_event(Events.PAUSE_TIMER, self.on_pause)
         session.bind_event(Events.UNPAUSE_TIMER, self.on_unpause)
         session.bind_event(Events.TIMERS_STOPPED, self.on_pause)

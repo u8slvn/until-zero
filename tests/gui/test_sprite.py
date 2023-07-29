@@ -9,6 +9,7 @@ from until_zero import constants as const
 from until_zero.events import Events
 from until_zero.gui.sprite import BongoCat
 from until_zero.gui.sprite import Sprite
+from until_zero.session import Session
 from until_zero.tools import open_alpha_image
 
 
@@ -67,13 +68,14 @@ def test_sprite_anime_frames(mocker, monkeypatch, sprite_app):
         ("start", Events.UNPAUSE_TIMER),
     ],
 )
-def test_bongo_cat_stop_or_start_on_event(mocker, neutral_test_session, action, event):
-    mocker.patch("until_zero.gui.sprite.session", neutral_test_session)
-    app = neutral_test_session.root
-    app.add_test_action(neutral_test_session.send_event, event)
+def test_bongo_cat_stop_or_start_on_event(mocker, test_app, action, event):
+    app = test_app(app_cls=tkinter.Tk)
+    session = Session(root=app)
     bongo_cat = BongoCat(app)
+    bongo_cat.bind_session(session=session)
     setattr(bongo_cat, action, mocker.Mock())
+    app.pump_events()
 
-    app.run_test_actions()
+    session.send_event(event=event)
 
     getattr(bongo_cat, action).assert_called_once()

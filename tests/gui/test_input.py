@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import tkinter
+
 import pytest
 
 from until_zero import constants as const
@@ -28,26 +30,32 @@ def test_validate_timers_input(value, result):
     assert TimersInput.validate_timers_input(value=value) is result
 
 
-def test_get_durations(mocker, neutral_test_session):
-    timers_input = TimersInput(neutral_test_session.root, mocker.MagicMock())
+def test_get_durations(mocker, test_app):
+    app = test_app(app_cls=tkinter.Tk)
+    timers_input = TimersInput(app, mocker.MagicMock())
     timers_input.input_var.get = mocker.Mock(return_value="100+10:10+1+10:5")
+    app.pump_events()
 
     result = timers_input.get_durations()
 
     assert result == [6000, 610, 60, 605]
 
 
-def test_clean(mocker, neutral_test_session):
-    timers_input = TimersInput(neutral_test_session.root, mocker.MagicMock())
+def test_clean(mocker, test_app):
+    app = test_app(app_cls=tkinter.Tk)
+    timers_input = TimersInput(app, mocker.MagicMock())
     timers_input.insert(0, "hello")
+    app.pump_events()
 
     timers_input.clean()
 
     assert timers_input.get() == ""
 
 
-def test_mark_as_status(mocker, neutral_test_session):
-    timers_input = TimersInput(neutral_test_session.root, mocker.MagicMock())
+def test_mark_as_status(mocker, test_app):
+    app = test_app(app_cls=tkinter.Tk)
+    timers_input = TimersInput(app, mocker.MagicMock())
+    app.pump_events()
 
     timers_input.mark_as_error()
 

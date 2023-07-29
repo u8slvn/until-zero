@@ -16,7 +16,7 @@ from until_zero.gui.input import TimersInput
 from until_zero.gui.label import Label
 from until_zero.gui.sprite import BongoCat
 from until_zero.gui.timer_display import TimerDisplay
-from until_zero.session import session
+from until_zero.session import Session
 from until_zero.tools import format_time_for_human
 from until_zero.tools import open_alpha_image
 
@@ -27,7 +27,7 @@ class App(tkinter.Tk):
         self.width = const.WINDOW_WIDTH
         self.height = const.WINDOW_HEIGHT
 
-        session.register_root(root=self)
+        self.session = Session(root=self)
 
         # --- Configure windows
         self.geometry(f"{self.width}x{self.height}")
@@ -40,16 +40,16 @@ class App(tkinter.Tk):
         self.position_window()
 
         # --- Frames
-        self.config_timers = ConfigTimersFrame(self)
+        self.config_timers = ConfigTimersFrame(self, session=self.session)
         self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
 
         # --- Timers window
-        self.timers_window = TimersWindow(self)
+        self.timers_window = TimersWindow(self, session=self.session)
 
         # --- Events
         self.bind(Events.START_TIMERS, self.on_start_timers)
         self.bind(Events.STOP_TIMERS, self.on_stop_timers)
-        self.bind("<Return>", session.start_timers)
+        self.bind("<Return>", self.session.start_timers)
 
     def position_window(self):
         self.update()
@@ -68,8 +68,9 @@ class App(tkinter.Tk):
 
 
 class ConfigTimersFrame(tkinter.Frame):
-    def __init__(self, parent: tkinter.Tk):
+    def __init__(self, parent: tkinter.Tk, session: Session):
         super().__init__(master=parent)
+        self.session = session
         self.rows = 5
         self.columns = 3
         self.configure(background=const.YELLOW)
@@ -80,13 +81,14 @@ class ConfigTimersFrame(tkinter.Frame):
 
         # --- Inputs
         self.timers_input = TimersInput(self, update_callback=self.update_sum_timers)
+        self.timers_input.bind("<Return>", self.session.start_timers)
 
         # --- Buttons
         self.clean_btn = CleanButton(self, command=self.timers_input.clean)
         self.task_btn = TaskButton(self, command=self.add_pomodoro_timer)
         self.short_break_btn = ShortBreakButton(self, command=self.add_pomodoro_timer)
         self.long_break_btn = LongBreakButton(self, command=self.add_pomodoro_timer)
-        self.start_button = StartButton(self, command=session.start_timers)
+        self.start_button = StartButton(self, command=self.session.start_timers)
 
         self._configure_component_grid()
 
@@ -112,7 +114,7 @@ class ConfigTimersFrame(tkinter.Frame):
 
     def update_sum_timers(self, *_) -> None:
         timer_durations = self.timers_input.get_durations()
-        sum_durations = session.set_timers(durations=timer_durations)
+        sum_durations = self.session.set_timers(durations=timer_durations)
 
         if sum_durations > 14400 * 60:
             self.timers_input.mark_as_error()
@@ -133,12 +135,13 @@ class ConfigTimersFrame(tkinter.Frame):
 
 
 class TimersWindow(tkinter.Toplevel):
-    def __init__(self, parent: tkinter.Tk) -> None:
+    def __init__(self, parent: tkinter.Tk, session: Session) -> None:
         super().__init__(master=parent)
+        self.session = session
         self.paused = False
         self.width = const.WINDOW_TIMER_WIDTH
         self.height = const.WINDOW_TIMER_HEIGHT
-        self.timers_sequence = session.get_timers_sequence()
+        self.timers_sequence = self.session.get_timers_sequence()
 
         # --- Configure windows
         self.geometry(f"{self.width}x{self.height}")
@@ -152,10 +155,12 @@ class TimersWindow(tkinter.Toplevel):
 
         # --- Buttons
         self.pause_btn = PauseReplayButton(self, command=self.pause_replay_click)
-        self.stop_btn = StopButton(self, command=session.stop_timers)
+        self.pause_btn.bind_session(session=self.session)
+        self.stop_btn = StopButton(self, command=self.session.stop_timers)
 
         # --- Sprites
         self.bongo_cat = BongoCat(self)
+        self.bongo_cat.bind_session(session=self.session)
 
         # --- Draggable
         self.draggable = Draggable(self, reset_pos_callback=self.position_window)
@@ -166,8 +171,8 @@ class TimersWindow(tkinter.Toplevel):
     def start(self) -> None:
         self.paused = False
         self.deiconify()
-        self.timer_display.set_timer_count(count=session.timer_count)
-        self.timers_sequence = session.get_timers_sequence()
+        self.timer_display.set_timer_count(count=self.session.timer_count)
+        self.timers_sequence = self.session.get_timers_sequence()
         self.tick()
 
     def stop(self) -> None:
@@ -198,19 +203,19 @@ class TimersWindow(tkinter.Toplevel):
     def pause_replay_click(self) -> None:
         # Replay
         if self.timers_sequence.is_done():
-            session.send_event(Events.UNPAUSE_TIMER)
+            self.session.send_event(Events.UNPAUSE_TIMER)
             self.paused = False
-            self.timers_sequence = session.get_timers_sequence()
+            self.timers_sequence = self.session.get_timers_sequence()
             self.tick()
             return
 
         # Toggle pause
         self.paused = not self.paused
         if self.paused is False and self.timers_sequence.is_done() is not None:
-            session.send_event(Events.UNPAUSE_TIMER)
+            self.session.send_event(Events.UNPAUSE_TIMER)
             self.after(1000, self.tick)
         else:
-            session.send_event(Events.PAUSE_TIMER)
+            self.session.send_event(Events.PAUSE_TIMER)
 
     def tick(self) -> None:
         if self.paused:
@@ -221,7 +226,7 @@ class TimersWindow(tkinter.Toplevel):
         if not self.timers_sequence.is_done():
             self.after(1000, self.tick)
         else:
-            session.send_event(Events.TIMERS_STOPPED)
+            self.session.send_event(Events.TIMERS_STOPPED)
 
     def update_timer_label(self) -> None:
         time = self.timers_sequence.get_current_timer_time_as_text()

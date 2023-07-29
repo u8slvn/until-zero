@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import tkinter
+
 from until_zero import constants as const
 from until_zero.gui.timer_display import TimersProgress
 
 
-def test_timers_progress(mocker, neutral_test_session):
-    app = neutral_test_session.root
+def test_timers_progress(mocker, test_app):
+    app = test_app(app_cls=tkinter.Tk)
     timers_progress = TimersProgress(app)
     timers_progress.set_timer_count(count=3)
     timers_progress.winfo_width = mocker.Mock(return_value=31)

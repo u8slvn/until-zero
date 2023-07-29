@@ -3,14 +3,17 @@ from __future__ import annotations
 import tkinter
 
 from functools import partial
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 
 from until_zero import constants as const
 from until_zero.session import Events
-from until_zero.session import session
 from until_zero.tools import open_alpha_image
 
+
+if TYPE_CHECKING:
+    from until_zero.session import Session
 
 BUTTON_THEMES = {
     "BLUE": {
@@ -87,6 +90,7 @@ class PauseReplayButton(Button):
         self.image_replay = open_alpha_image(const.ASSETS_DIR.joinpath("btn-replay.png"))
         self._status = "play"
 
+    def bind_session(self, session: Session) -> None:
         session.bind_event(Events.PAUSE_TIMER, self.on_pause)
         session.bind_event(Events.UNPAUSE_TIMER, self.on_unpause)
         session.bind_event(Events.TIMERS_STOPPED, self.on_timers_stop)

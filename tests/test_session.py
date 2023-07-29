@@ -5,8 +5,7 @@ import tkinter
 import pytest
 
 from until_zero.events import Events
-from until_zero.session import SessionNotRegistered
-from until_zero.session import _Session
+from until_zero.session import Session
 from until_zero.timer import Timer
 from until_zero.timer import TimersSequence
 
@@ -14,24 +13,16 @@ from until_zero.timer import TimersSequence
 @pytest.fixture
 def session(mocker):
     root = mocker.Mock(spec=tkinter.Tk)
-    session = _Session()
-    session._root = root
+    session = Session(root=root)
+    session.root = root
 
     return session
 
 
-def test_use_session_with_no_tk_root():
-    session = _Session()
-
-    with pytest.raises(SessionNotRegistered):
-        _ = session.root
-
-
-def test_register_root(mocker):
-    session = _Session()
+def test_session_setup_event(mocker):
     root = mocker.Mock(spec=tkinter.Tk)
 
-    session.register_root(root=root)
+    session = Session(root=root)
 
     calls = [mocker.call(event, "None") for event in Events]
     root.event_add.assert_has_calls(calls)
@@ -41,7 +32,7 @@ def test_register_root(mocker):
 def test_bind_event(session, mocker):
     session.bind_event(Events.STOP_TIMERS, mocker.sentinel.callback)
 
-    session.root.bind.assert_called_once_with(
+    assert session.root.bind.call_args_list[1] == mocker.call(
         Events.STOP_TIMERS, mocker.sentinel.callback, add="+"
     )
 
