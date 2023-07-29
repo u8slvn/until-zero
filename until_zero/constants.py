@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import sys
+
 from pathlib import Path
 
 
 # --- Locations
-ROOT_DIR = Path(__file__).parent
+if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    ROOT_DIR = Path(sys._MEIPASS)
+elif __file__:
+    ROOT_DIR = Path(__file__).parent
 ASSETS_DIR = ROOT_DIR.joinpath("assets")
 
 # --- Window info
