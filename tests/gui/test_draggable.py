@@ -3,8 +3,8 @@ from __future__ import annotations
 from until_zero.gui.draggable import Draggable
 
 
-def test_draggable(mocker, test_session):
-    app = test_session.root
+def test_draggable(mocker, neutral_test_session):
+    app = neutral_test_session.root
     app.winfo_pointerxy = mocker.Mock(return_value=(100, 100))
     app.geometry = mocker.Mock(return_value="50+50+50")
     draggable = Draggable(app, mocker.Mock())

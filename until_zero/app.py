@@ -44,11 +44,12 @@ class App(tkinter.Tk):
         self.config_timers.grid(row=0, column=0, sticky=tkinter.NSEW)
 
         # --- Timers window
-        self.timers_widget = TimersWindow(self)
+        self.timers_window = TimersWindow(self)
 
         # --- Events
         self.bind(Events.START_TIMERS, self.on_start_timers)
         self.bind(Events.STOP_TIMERS, self.on_stop_timers)
+        self.bind("<Return>", session.start_timers)
 
     def position_window(self):
         self.update()
@@ -57,11 +58,11 @@ class App(tkinter.Tk):
         self.geometry(f"+{x}+{y}")
 
     def on_start_timers(self, _: tkinter.Event) -> None:
-        self.timers_widget.start()
+        self.timers_window.start()
         self.withdraw()
 
     def on_stop_timers(self, _: tkinter.Event) -> None:
-        self.timers_widget.stop()
+        self.timers_window.stop()
         self.deiconify()
         self.config_timers.timers_input.focus_set()
 
@@ -79,7 +80,6 @@ class ConfigTimersFrame(tkinter.Frame):
 
         # --- Inputs
         self.timers_input = TimersInput(self, update_callback=self.update_sum_timers)
-        self.timers_input.bind("<Return>", session.start_timers)
 
         # --- Buttons
         self.clean_btn = CleanButton(self, command=self.timers_input.clean)
