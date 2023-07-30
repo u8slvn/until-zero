@@ -67,8 +67,8 @@ def build_pyinstaller_args(
     logger.info(f"→ Output exe filename: {output_name}")
     build_args += [f"-n {output_name}"]
 
-    logger.info(f"→ Output file icon: {ASSETS_PATH.joinpath('icon-32.png')}")
-    build_args += ["--icon", f"{ASSETS_PATH.joinpath('icon-32.png')}"]
+    logger.info(f"→ Output file icon: {PROJECT_PATH.joinpath('icon-48.png')}")
+    build_args += ["--icon", f"{ASSETS_PATH.joinpath('icon-48.png')}"]
 
     logger.info(f"→ Add assets folder: {ASSETS_PATH}")
     build_args += ["--add-data", f"{ASSETS_PATH};./{ASSETS_FOLDER}"]
