@@ -390,6 +390,17 @@ pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
 
 [[package]]
+name = "pyglet"
+version = "2.0.9"
+description = "Cross-platform windowing and multimedia library"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyglet-2.0.9-py3-none-any.whl", hash = "sha256:8520b22dde75f47167e1fedeed58ac0bb0c890c0dca17d8528427d6b318cd9cc"},
+    {file = "pyglet-2.0.9.zip", hash = "sha256:a0922e42f2d258505678e2f4a355c5476c1a6352c3f3a37754042ddb7e7cf72f"},
+]
+
+[[package]]
 name = "pyinstaller"
 version = "5.13.0"
 description = "PyInstaller bundles a Python application and all its dependencies into a single package."
@@ -620,4 +631,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11, <3.13"
-content-hash = "d805bde13ac398331650e425b7f11991e93a5c1b8bc5cdd44bd7bd764038783a"
+content-hash = "e91f8794fd12d2ccbab102f9bbebd6520a99853208d7f09cee6da616b445d6a9"
