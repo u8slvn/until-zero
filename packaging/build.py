@@ -59,13 +59,13 @@ def build_pyinstaller_args(
     build_args += [script_entrypoint]
 
     logger.info(f"→ Path to search for imports: {PACKAGE_PATH}")
-    build_args += [f"-p {PACKAGE_PATH}"]
+    build_args += ["-p", f"{PACKAGE_PATH}"]
 
     logger.info(f"→ Spec file path: {BUILD_PATH}")
     build_args += ["--specpath", f"{BUILD_PATH}"]
 
     logger.info(f"→ Output exe filename: {output_name}")
-    build_args += [f"-n {output_name}"]
+    build_args += ["-n", output_name]
 
     logger.info(f"→ Output file icon: {PROJECT_PATH.joinpath('icon-48.png')}")
     build_args += ["--icon", f"{ASSETS_PATH.joinpath('icon-48.png')}"]
