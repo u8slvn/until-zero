@@ -5,8 +5,10 @@ import sys
 from pathlib import Path
 
 
+COMPILED_ENV = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+
 # --- Locations
-if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+if COMPILED_ENV:
     ROOT_DIR = Path(sys._MEIPASS)
 elif __file__:
     ROOT_DIR = Path(__file__).parent

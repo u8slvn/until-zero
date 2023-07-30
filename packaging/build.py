@@ -14,15 +14,15 @@ import PyInstaller.__main__  # noqa
 logger = logging.getLogger(__name__)
 
 # ------ Build config ------
-package_name = "until_zero"
-assets_folder = "assets"
-upx_version = "4.0.2"
+PACKAGE_NAME = "until_zero"
+ASSETS_FOLDER = "assets"
+UPX_VERSION = "4.0.2"
 
 # ------ Build paths ------
-build_path = Path(__file__).parent.resolve()
-project_path = build_path.parent.resolve()
-package_path = project_path.joinpath(package_name).resolve()
-assets_path = package_path.joinpath(assets_folder)
+BUILD_PATH = Path(__file__).parent.resolve()
+PROJECT_PATH = BUILD_PATH.parent.resolve()
+PACKAGE_PATH = PROJECT_PATH.joinpath(PACKAGE_NAME).resolve()
+ASSETS_PATH = PACKAGE_PATH.joinpath(ASSETS_FOLDER)
 
 
 def install_upx(version: str, os: str | None = None) -> Path:
@@ -31,14 +31,14 @@ def install_upx(version: str, os: str | None = None) -> Path:
     upx_filename = f"{upx_filename}-{os}" if os is not None else upx_filename
     upx_zipfile = f"{upx_filename}.zip"
     upx_url = f"https://github.com/upx/upx/releases/download/v{version}/{upx_zipfile}"
-    upx_path = build_path.joinpath(upx_filename)
+    upx_path = BUILD_PATH.joinpath(upx_filename)
 
     logger.info(f"→ Downloading UPX: {upx_url}")
     urllib.request.urlretrieve(url=upx_url, filename=upx_zipfile)
 
-    logger.info(f"→ Extract UPX to: {build_path}")
+    logger.info(f"→ Extract UPX to: {BUILD_PATH}")
     with zipfile.ZipFile(upx_zipfile, "r") as zip_ref:
-        zip_ref.extractall(build_path)
+        zip_ref.extractall(BUILD_PATH)
 
     return upx_path
 
@@ -52,27 +52,29 @@ def build_pyinstaller_args(
     logger.info("Build Pyinstaller args.")
     build_args = []
     output_name = f"until-zero-{package_version}-{os_name}-{arch}"
-    script_entrypoint = f"{package_name}/__main__.py"
+    script_entrypoint = f"{PACKAGE_NAME}/__main__.py"
 
     logger.info(f"→ entrypoint: {script_entrypoint}")
     build_args += [script_entrypoint]
 
-    logger.info(f"→ Path to search for imports: {package_path}")
-    build_args += [f"-p {package_path}"]
+    logger.info(f"→ Path to search for imports: {PACKAGE_PATH}")
+    build_args += [f"-p {PACKAGE_PATH}"]
 
-    logger.info(f"→ Spec file path: {build_path}")
-    build_args += ["--specpath", f"{build_path}"]
+    logger.info(f"→ Spec file path: {BUILD_PATH}")
+    build_args += ["--specpath", f"{BUILD_PATH}"]
 
     logger.info(f"→ Output exe filename: {output_name}")
     build_args += [f"-n {output_name}"]
 
-    logger.info(f"→ Output file icon: {assets_path.joinpath('icon-32.png')}")
-    build_args += ["--icon", f"{assets_path.joinpath('icon-32.png')}"]
+    logger.info(f"→ Output file icon: {ASSETS_PATH.joinpath('icon-32.png')}")
+    build_args += ["--icon", f"{ASSETS_PATH.joinpath('icon-32.png')}"]
 
-    logger.info(f"→ Add assets folder: {assets_path}")
-    build_args += ["--add-data", f"{assets_path};./{assets_folder}"]
+    logger.info(f"→ Add assets folder: {ASSETS_PATH}")
+    build_args += ["--add-data", f"{ASSETS_PATH};./{ASSETS_FOLDER}"]
 
-    # --- Setup build options
+    logger.info(f"→ Add splash image: {ASSETS_PATH.joinpath('splash.png')}")
+    build_args += ["--splash", f"{ASSETS_PATH.joinpath('splash.png')}"]
+
     logger.info("→ Build options: onefile, noconsole, clean")
     build_args += [
         "--onefile",  # One compressed output file
@@ -111,7 +113,7 @@ if __name__ == "__main__":
     else:
         arch = "x64"
 
-    upx_path = install_upx(version=upx_version, os=os)
+    upx_path = install_upx(version=UPX_VERSION, os=os)
     build_args = build_pyinstaller_args(
         package_version="0.1.0",
         os_name=os_name,
