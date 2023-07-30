@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from until_zero import App
 from until_zero.constants import COMPILED_ENV
+from until_zero.font import load_font
 
 
 if COMPILED_ENV:
@@ -9,6 +10,7 @@ if COMPILED_ENV:
 
 
 if __name__ == "__main__":
+    load_font()
     app = App()
 
     if COMPILED_ENV:
