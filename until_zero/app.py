@@ -32,7 +32,7 @@ class App(tkinter.Tk):
         # --- Configure windows
         self.geometry(f"{self.width}x{self.height}")
         self.title(const.WINDOW_TITLE)
-        self.iconphoto(True, open_alpha_image(const.ASSETS_DIR.joinpath("icon-32.png")))
+        self.iconphoto(True, open_alpha_image(const.ASSETS_DIR.joinpath("icon-48.png")))
         self.resizable(width=False, height=False)
         self.configure(background=const.YELLOW)
         self.grid_rowconfigure(0, weight=1)
