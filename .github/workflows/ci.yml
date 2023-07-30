@@ -61,7 +61,7 @@ jobs:
     - name: Check tests
       run: |
         poetry run mypy
-        poetry run pytest --cov until_zero
+        poetry run pytest
 
     - name: Publish coverage
       env:
