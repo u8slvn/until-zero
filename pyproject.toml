@@ -44,7 +44,9 @@ extend-select = [
 force-single-line = true
 lines-between-types = 1
 lines-after-imports = 2
-required-imports = ["from __future__ import annotations"]
+required-imports = [
+    "from __future__ import annotations",
+]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -53,3 +55,4 @@ exclude_lines = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = ["--cov=until_zero"]
