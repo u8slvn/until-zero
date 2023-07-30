@@ -9,7 +9,7 @@ COMPILED_ENV = getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
 
 # --- Locations
 if COMPILED_ENV:
-    ROOT_DIR = Path(sys._MEIPASS)
+    ROOT_DIR = Path(sys._MEIPASS)  # type: ignore
 elif __file__:
     ROOT_DIR = Path(__file__).parent
 ASSETS_DIR = ROOT_DIR.joinpath("assets")

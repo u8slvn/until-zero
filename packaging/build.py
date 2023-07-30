@@ -6,6 +6,7 @@ import logging
 import urllib.request
 import zipfile
 
+from importlib import metadata
 from pathlib import Path
 
 import PyInstaller.__main__  # noqa
@@ -93,6 +94,10 @@ def run_pyinstaller(build_args: list[str]) -> None:
     PyInstaller.__main__.run(build_args)
 
 
+def get_package_version() -> str:
+    return metadata.version(PACKAGE_NAME)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Until Zero build script.")
     parser.add_argument(
@@ -114,8 +119,9 @@ if __name__ == "__main__":
         arch = "x64"
 
     upx_path = install_upx(version=UPX_VERSION, os=os)
+    package_version = get_package_version()
     build_args = build_pyinstaller_args(
-        package_version="0.1.0",
+        package_version=package_version,
         os_name=os_name,
         arch=arch,
         upx_path=upx_path,
