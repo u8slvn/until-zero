@@ -5,7 +5,7 @@ from until_zero.constants import COMPILED_ENV
 
 
 if COMPILED_ENV:
-    import pyi_splash
+    import pyi_splash  # type: ignore
 
 
 if __name__ == "__main__":
