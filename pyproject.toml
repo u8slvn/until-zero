@@ -13,6 +13,7 @@ playsound = "1.2.2"
 pyglet = "^2.0.9"
 pyinstaller = "^5.13.0"
 pillow = "9.5.0"
+pyinstaller-versionfile = {version = "^2.1.1", extras = ["build"]}
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.3"
