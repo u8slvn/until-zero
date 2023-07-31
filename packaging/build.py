@@ -10,14 +10,24 @@ from importlib import metadata
 from pathlib import Path
 
 import PyInstaller.__main__  # noqa
+import pyinstaller_versionfile
 
 
 logger = logging.getLogger(__name__)
 
 # ------ Build config ------
+APP_NAME = "Until Zero"
 PACKAGE_NAME = "until_zero"
 ASSETS_FOLDER = "assets"
 UPX_VERSION = "4.0.2"
+
+# ------ Versionfile info ------
+COMPANY_NAME = "u8slvn"
+FILE_DESCRIPTION = APP_NAME
+INTERNAL_NAME = APP_NAME
+LEGAL_COPYRIGHT = "MIT License - Copyright (c) 2023 u8slvn"
+PRODUCT_NAME = APP_NAME
+
 
 # ------ Build paths ------
 BUILD_PATH = Path(__file__).parent.resolve()
@@ -34,10 +44,10 @@ def install_upx(version: str, os: str | None = None) -> Path:
     upx_url = f"https://github.com/upx/upx/releases/download/v{version}/{upx_zipfile}"
     upx_path = BUILD_PATH.joinpath(upx_filename)
 
-    logger.info(f"→ Downloading UPX: {upx_url}")
+    logger.info(f"Downloading UPX: {upx_url}")
     urllib.request.urlretrieve(url=upx_url, filename=upx_zipfile)
 
-    logger.info(f"→ Extract UPX to: {BUILD_PATH}")
+    logger.info(f"Extract UPX to: {BUILD_PATH}")
     with zipfile.ZipFile(upx_zipfile, "r") as zip_ref:
         zip_ref.extractall(BUILD_PATH)
 
@@ -45,38 +55,36 @@ def install_upx(version: str, os: str | None = None) -> Path:
 
 
 def build_pyinstaller_args(
-    package_version: str,
-    os_name: str,
-    arch: str,
+    output_filename: str,
     upx_path: Path | None = None,
+    versionfile_path: Path | None = None,
 ) -> list[str]:
     logger.info("Build Pyinstaller args.")
     build_args = []
-    output_name = f"until-zero-{package_version}-{os_name}-{arch}"
     script_entrypoint = f"{PACKAGE_NAME}/__main__.py"
 
-    logger.info(f"→ entrypoint: {script_entrypoint}")
+    logger.info(f"entrypoint: {script_entrypoint}")
     build_args += [script_entrypoint]
 
-    logger.info(f"→ Path to search for imports: {PACKAGE_PATH}")
+    logger.info(f"Path to search for imports: {PACKAGE_PATH}")
     build_args += ["-p", f"{PACKAGE_PATH}"]
 
-    logger.info(f"→ Spec file path: {BUILD_PATH}")
+    logger.info(f"Spec file path: {BUILD_PATH}")
     build_args += ["--specpath", f"{BUILD_PATH}"]
 
-    logger.info(f"→ Output exe filename: {output_name}")
-    build_args += ["-n", output_name]
+    logger.info(f"Output exe filename: {output_filename}")
+    build_args += ["-n", output_filename]
 
-    logger.info(f"→ Output file icon: {PROJECT_PATH.joinpath('icon-48.png')}")
+    logger.info(f"Output file icon: {ASSETS_PATH.joinpath('icon-48.png')}")
     build_args += ["--icon", f"{ASSETS_PATH.joinpath('icon-48.png')}"]
 
-    logger.info(f"→ Add assets folder: {ASSETS_PATH}")
+    logger.info(f"Add assets folder: {ASSETS_PATH}")
     build_args += ["--add-data", f"{ASSETS_PATH};./{ASSETS_FOLDER}"]
 
-    logger.info(f"→ Add splash image: {ASSETS_PATH.joinpath('splash.png')}")
+    logger.info(f"Add splash image: {ASSETS_PATH.joinpath('splash.png')}")
     build_args += ["--splash", f"{ASSETS_PATH.joinpath('splash.png')}"]
 
-    logger.info("→ Build options: onefile, noconsole, clean")
+    logger.info("Build options: onefile, noconsole, clean")
     build_args += [
         "--onefile",  # One compressed output file
         "--noconsole",  # Disable log window
@@ -84,8 +92,12 @@ def build_pyinstaller_args(
     ]
 
     if upx_path is not None:
-        logger.info(f"→ Upx path: {upx_path}")
+        logger.info(f"Upx path: {upx_path}")
         build_args += ["--upx-dir", f"{upx_path}"]
+
+    if versionfile_path is not None:
+        logger.info(f"Versionfile path: {versionfile_path}")
+        build_args += ["--version-file", f"{versionfile_path}"]
 
     return build_args
 
@@ -96,6 +108,23 @@ def run_pyinstaller(build_args: list[str]) -> None:
 
 def get_package_version() -> str:
     return metadata.version(PACKAGE_NAME)
+
+
+def generate_versionfile(package_version: str, output_filename: str) -> Path:
+    logger.info("Generate versionfile.txt.")
+    versionfile_path = BUILD_PATH.joinpath("versionfile.txt")
+    pyinstaller_versionfile.create_versionfile(
+        output_file=versionfile_path,
+        version=package_version,
+        company_name=COMPANY_NAME,
+        file_description=FILE_DESCRIPTION,
+        internal_name=INTERNAL_NAME,
+        legal_copyright=LEGAL_COPYRIGHT,
+        original_filename=f"{output_filename}.exe",
+        product_name=PRODUCT_NAME,
+    )
+
+    return versionfile_path
 
 
 if __name__ == "__main__":
@@ -118,12 +147,19 @@ if __name__ == "__main__":
     else:
         arch = "x64"
 
-    upx_path = install_upx(version=UPX_VERSION, os=os)
     package_version = get_package_version()
+    output_filename = f"until-zero-{package_version}-{os_name}-{arch}"
+
+    versionfile_path = None
+    if os_name == "windows":
+        versionfile_path = generate_versionfile(
+            package_version=package_version,
+            output_filename=output_filename,
+        )
+    upx_path = install_upx(version=UPX_VERSION, os=os)
     build_args = build_pyinstaller_args(
-        package_version=package_version,
-        os_name=os_name,
-        arch=arch,
+        output_filename=output_filename,
         upx_path=upx_path,
+        versionfile_path=versionfile_path,
     )
     run_pyinstaller(build_args=build_args)

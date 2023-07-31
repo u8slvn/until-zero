@@ -162,3 +162,6 @@ cython_debug/
 # UPX archive
 upx-*.zip
 packaging/upx-*
+
+# Versionfile
+**/versionfile.txt
