@@ -40,6 +40,7 @@ class TimersProgress(tkinter.Canvas):
         self.separator = 2
 
     def set_timer_count(self, count: int) -> None:
+        self.configure(background=const.BLACK)  # Reset background from possible previous run
         self.timer_count = count
 
     def update_progress(self, timer_index: int) -> None:
