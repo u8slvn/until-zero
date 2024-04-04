@@ -11,7 +11,7 @@
     <a href="https://github.com/u8slvn/until-zero"><img src="https://img.shields.io/github/license/u8slvn/until-zero" alt="Project license"></a>
 </p>
 
-**Until Zero - タイマー** is toy program allowing to sequence multiple timers. It can be used as a [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) timer or you can setup your own custom timers list.
+**Until Zero - タイマー** is a toy program allowing to sequence multiple timers. It can be used as a [pomodoro](https://en.wikipedia.org/wiki/Pomodoro_Technique) timer, or you can also set up your own custom timers list.
 
 <p align="center">
     <a href="#readme">
@@ -27,9 +27,9 @@
     <a href="https://github.com/u8slvn/until-zero/releases">Download latest release 📦</a>
 </p>
 
-## 🚀 Quick Start
+## Quick Start
 
-The timers sequence configuration field must respect the following syntax **without spaces**:
+The timer sequence configuration field must respect the following syntax **without spaces**:
 
 ```
 minutes:secondes + minutes:secondes + minutes:secondes + ...
@@ -37,7 +37,7 @@ minutes:secondes + minutes:secondes + minutes:secondes + ...
 
 Note that `:secondes` is non-mandatory and only `minutes` is needed to set a timer.
 
-### 📚 Examples
+### Examples
 
   - 1 minute: `1`
   - 1 minute: `0:60`
@@ -46,7 +46,7 @@ Note that `:secondes` is non-mandatory and only `minutes` is needed to set a tim
   - 1 hour **+** 5 minutes and 30 seconds: `60+5+0:30`
   - 1 day (24 x 60 minutes): `1440`
 
-### ⏱️ Pomodoro
+### Pomodoro
 
 You can also use the pomodoro buttons to sequence your timers.
 
@@ -54,13 +54,13 @@ You can also use the pomodoro buttons to sequence your timers.
   - `SHORT BREAK`: 5 minutes
   - `LONG BREAK`: 20 minutes
 
-If you plan 4 sessions with 2 short breaks and 1 long break you should get as result: `25+5+25+20+25+5+25`
+Here is an example for four task sessions with two short breaks and one long break: `25+5+25+20+25+5+25`
 
-### 🏁 Run
+### Run
 
-Once you configured your timers you can start the sequence by clicking on `START`. The timers window should appear in top of your screen, if the position does not please you, you can move it around by holding the drag zone on the right. If you want to reset the timers window position just double-click on the drag zone icon `⋮`.
+Once you configured your timers you can start the sequence by clicking on `START`. The timer window should appear on top of your screen, if the position does not please you, you can move it around by holding the drag zone on the right. If you want to reset the timer window position, double-click on the drag zone icon `⋮`.
 
-## 🛑 Limitations
+## Limitations
 
 Until Zero - タイマー has some feature limitations:
 
