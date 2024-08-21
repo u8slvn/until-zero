@@ -14,7 +14,6 @@ class Timer:
     sound = str(const.ASSETS_DIR.joinpath("bip.mp3"))
 
     def __init__(self, duration: int) -> None:
-        self.paused = True
         self.duration = float(duration)
         self._time = self.duration
         self._last_tick = 0.0
@@ -23,6 +22,9 @@ class Timer:
     @property
     def time(self) -> int:
         return round(self._time)
+
+    def pause(self) -> None:
+        self._last_tick = 0.0
 
     def reset(self) -> None:
         self._last_tick = 0.0
@@ -69,6 +71,10 @@ class TimersSequence:
 
     def is_done(self) -> bool:
         return not self._running
+
+    def pause(self) -> None:
+        if self._current_timer is not None:
+            self._current_timer.pause()
 
     def tick(self):
         if self._current_timer is None:

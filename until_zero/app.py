@@ -216,6 +216,7 @@ class TimersWindow(tkinter.Toplevel):
             self.after(100, self.tick)
         else:
             self.session.send_event(Events.PAUSE_TIMER)
+            self.timers_sequence.pause()
 
     def tick(self) -> None:
         if self.paused:
