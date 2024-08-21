@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 from typing import Generator
 
 from playsound import playsound
@@ -9,24 +11,37 @@ from until_zero.tools import format_time_for_human
 
 
 class Timer:
-    tick_duration = 1000
     sound = str(const.ASSETS_DIR.joinpath("bip.mp3"))
 
     def __init__(self, duration: int) -> None:
         self.paused = True
-        self.duration = duration
-        self.time = duration
+        self.duration = float(duration)
+        self._time = self.duration
+        self._last_tick = 0.0
+        self._done = False
+
+    @property
+    def time(self) -> int:
+        return round(self._time)
 
     def reset(self) -> None:
-        self.time = self.duration
+        self._last_tick = 0.0
+        self._time = self.duration
+        self._done = False
 
     def tick(self) -> None:
-        if self.time <= 0:
+        if self.time <= 0 and not self._done:
+            self._done = True
             self.ring()
-        self.time -= 1
+
+        if self._last_tick == 0.0:
+            self._last_tick = time.time()
+
+        self._time -= time.time() - self._last_tick
+        self._last_tick = time.time()
 
     def is_ended(self) -> bool:
-        return self.time < 0
+        return self._done
 
     def ring(self) -> None:
         playsound(self.sound, block=False)
