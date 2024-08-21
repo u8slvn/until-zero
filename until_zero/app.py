@@ -169,7 +169,9 @@ class TimersWindow(tkinter.Toplevel):
         self.withdraw()
 
     def start(self) -> None:
-        self.paused = False
+        if self.paused is True:
+            self.paused = False
+            self.session.send_event(Events.UNPAUSE_TIMER)
         self.deiconify()
         self.timer_display.set_timer_count(count=self.session.timer_count)
         self.timers_sequence = self.session.get_timers_sequence()
