@@ -213,7 +213,7 @@ class TimersWindow(tkinter.Toplevel):
         self.paused = not self.paused
         if self.paused is False and self.timers_sequence.is_done() is not None:
             self.session.send_event(Events.UNPAUSE_TIMER)
-            self.after(1000, self.tick)
+            self.after(100, self.tick)
         else:
             self.session.send_event(Events.PAUSE_TIMER)
 
@@ -224,7 +224,7 @@ class TimersWindow(tkinter.Toplevel):
         self.update_timer_label()
         self.timers_sequence.tick()
         if not self.timers_sequence.is_done():
-            self.after(1000, self.tick)
+            self.after(100, self.tick)
         else:
             self.session.send_event(Events.TIMERS_STOPPED)
 
